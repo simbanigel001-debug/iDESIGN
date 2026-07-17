@@ -8,10 +8,13 @@ let modules = [
         drawersCount: 3, 
         drawerType: "external", 
         drawerHandle: "bar-black", 
+        drawerHandleSize: 160,
         doorsCount: 1, 
         doorStyle: "shaker",
         doorHandle: "bar-black",
-        doorHeight: 1400 
+        doorHandleSize: 160,
+        doorHeight: 1400,
+        alumColor: "silver"
     }
 ];
 
@@ -21,28 +24,27 @@ let rotation = { x: -15, y: -20 };
 
 const handleCatalogOptions = `
     <option value="none">Tip-On / Push-to-Open</option>
-    <option value="gola">Continuous Gola Integrated Profile</option>
-    <optgroup label="T-Bar & Pull Hardware">
-        <option value="bar-black">Matte Black T-Bar (160mm)</option>
-        <option value="bar-chrome">Polished Chrome T-Bar (160mm)</option>
-        <option value="bar-brushed">Brushed Brass T-Bar (192mm)</option>
-        <option value="cup-antique">Antique Bin Cup Pull</option>
-    </optgroup>
-    <optgroup label="Minimalist Profiles">
-        <option value="edge-lip-black">Slimline Black Lip Profile</option>
-        <option value="edge-lip-silver">Anodized Aluminium Edge Pull</option>
-    </optgroup>
+    <option value="bar-black">Matte Black Pull Bar</option>
+    <option value="bar-chrome">Polished Chrome Pull Bar</option>
+    <option value="bar-brushed">Brushed Brass Pull Bar</option>
+    <option value="cup-antique">Antique Bin Cup Pull</option>
+`;
+
+const handleSizeOptions = `
+    <option value="96">96mm</option>
+    <option value="128">128mm</option>
+    <option value="160" selected>160mm</option>
+    <option value="192">192mm</option>
+    <option value="288">288mm</option>
 `;
 
 window.onload = function() {
     setup3DControls();
-    // Injects Masonite directly back into your HTML sidebar dropdown dynamically
     const backSelect = document.getElementById("backMaterial");
     if (backSelect) {
         backSelect.innerHTML = `
             <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
             <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
-            <option value="Folkstone Grey" data-thick="9">Folkstone Grey Melamine (9mm)</option>
             <option value="Standard Masonite" data-thick="3">Standard Masonite (3mm)</option>
             <option value="White Masonite" data-thick="3">White Masonite (3mm)</option>
         `;
@@ -55,12 +57,14 @@ function setup3DControls() {
     const stage = document.getElementById("stage");
     if (!viewport || !stage) return;
 
+    viewport.style.perspective = "1200px";
+
     const startDrag = (x, y) => { isDragging = true; previousMousePosition = { x, y }; };
     const moveDrag = (x, y) => {
         if (!isDragging) return;
         const deltaMove = { x: x - previousMousePosition.x, y: y - previousMousePosition.y };
-        rotation.y += deltaMove.x * 0.5;
-        rotation.x -= deltaMove.y * 0.5;
+        rotation.y += deltaMove.x * 0.4;
+        rotation.x -= deltaMove.y * 0.4;
         rotation.x = Math.max(-60, Math.min(60, rotation.x));
         stage.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`;
         previousMousePosition = { x, y };
@@ -75,11 +79,6 @@ function setup3DControls() {
 }
 
 function syncBackingThickness() {
-    const backSelect = document.getElementById("backMaterial");
-    const thicknessInput = document.getElementById("backThickness");
-    if (backSelect && thicknessInput) {
-        thicknessInput.value = backSelect.options[backSelect.selectedIndex].getAttribute("data-thick") || "16";
-    }
     calculateCabinetSetup();
 }
 
@@ -87,8 +86,8 @@ function addNewModule() {
     const id = modules.length > 0 ? Math.max(...modules.map(m => m.id)) + 1 : 1;
     modules.push({ 
         id, type: "shelves", width: 500, shelvesCount: 3, drawersCount: 0, 
-        drawerType: "internal", drawerHandle: "none", doorsCount: 1, 
-        doorStyle: "shaker", doorHandle: "bar-black", doorHeight: 2000 
+        drawerType: "internal", drawerHandle: "none", drawerHandleSize: 160, doorsCount: 1, 
+        doorStyle: "shaker", doorHandle: "bar-black", doorHandleSize: 160, doorHeight: 2000, alumColor: "silver"
     });
     calculateCabinetSetup();
 }
@@ -101,7 +100,7 @@ function removeModule(id) {
 function updateModuleParam(id, param, value) {
     const mod = modules.find(m => m.id === id);
     if (mod) {
-        if (["type", "drawerType", "drawerHandle", "doorStyle", "doorHandle"].includes(param)) {
+        if (["type", "drawerType", "drawerHandle", "doorStyle", "doorHandle", "alumColor"].includes(param)) {
             mod[param] = value;
         } else {
             mod[param] = parseInt(value) || 0;
@@ -151,16 +150,15 @@ function renderModulesControlPanel() {
 
             <div class="input-grid" ${mod.drawersCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
-                    <label>Drawer Box Layout</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'drawerType', this.value)">
-                        <option value="internal" ${mod.drawerType === 'internal' ? 'selected' : ''}>Internal (Hidden)</option>
-                        <option value="external" ${mod.drawerType === 'external' ? 'selected' : ''}>External (Exposed Fronts)</option>
-                    </select>
-                </div>
-                <div class="input-group">
                     <label>Drawer Handle Style</label>
                     <select onchange="updateModuleParam(${mod.id}, 'drawerHandle', this.value)">
                         ${handleCatalogOptions}
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Drawer Handle Size</label>
+                    <select onchange="updateModuleParam(${mod.id}, 'drawerHandleSize', this.value)">
+                        ${handleSizeOptions}
                     </select>
                 </div>
             </div>
@@ -169,7 +167,7 @@ function renderModulesControlPanel() {
                 <div class="input-group">
                     <label>No. of Doors</label>
                     <select onchange="updateModuleParam(${mod.id}, 'doorsCount', this.value)">
-                        <option value="0" ${mod.doorsCount === 0 ? 'selected' : ''}>No Doors (Open Front)</option>
+                        <option value="0" ${mod.doorsCount === 0 ? 'selected' : ''}>No Doors</option>
                         <option value="1" ${mod.doorsCount === 1 ? 'selected' : ''}>Single Door</option>
                         <option value="2" ${mod.doorsCount === 2 ? 'selected' : ''}>Double Doors</option>
                     </select>
@@ -189,18 +187,42 @@ function renderModulesControlPanel() {
                         <option value="aluminium-glass" ${mod.doorStyle === 'aluminium-glass' ? 'selected' : ''}>Aluminium Glass Door</option>
                     </select>
                 </div>
+                <div class="input-group" ${mod.doorStyle === 'aluminium-glass' ? '' : 'style="display:none;"'}>
+                    <label>Aluminium Frame Color</label>
+                    <select onchange="updateModuleParam(${mod.id}, 'alumColor', this.value)">
+                        <option value="silver" ${mod.alumColor === 'silver' ? 'selected' : ''}>Natural Anodized Silver</option>
+                        <option value="black" ${mod.alumColor === 'black' ? 'selected' : ''}>Matt Black</option>
+                        <option value="gold" ${mod.alumColor === 'gold' ? 'selected' : ''}>Brushed Gold</option>
+                        <option value="champagne" ${mod.alumColor === 'champagne' ? 'selected' : ''}>Champagne / Bronze</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-grid" ${mod.doorsCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
                     <label>Door Handle Hardware</label>
                     <select onchange="updateModuleParam(${mod.id}, 'doorHandle', this.value)">
                         ${handleCatalogOptions}
                     </select>
                 </div>
+                <div class="input-group">
+                    <label>Door Handle Size</label>
+                    <select onchange="updateModuleParam(${mod.id}, 'doorHandleSize', this.value)">
+                        ${handleSizeOptions}
+                    </select>
+                </div>
             </div>
         `;
         listContainer.appendChild(card);
 
-        if (mod.drawersCount > 0) card.querySelector(`[onchange*="drawerHandle"]`).value = mod.drawerHandle;
-        if (mod.doorsCount > 0) card.querySelector(`[onchange*="doorHandle"]`).value = mod.doorHandle;
+        if (mod.drawersCount > 0) {
+            card.querySelector(`[onchange*="drawerHandle"]`).value = mod.drawerHandle;
+            card.querySelector(`[onchange*="drawerHandleSize"]`).value = mod.drawerHandleSize;
+        }
+        if (mod.doorsCount > 0) {
+            card.querySelector(`[onchange*="doorHandle"]`).value = mod.doorHandle;
+            card.querySelector(`[onchange*="doorHandleSize"]`).value = mod.doorHandleSize;
+        }
     });
 
     document.getElementById("viewport-badge").innerText = `${modules.length} Unit(s) Loaded`;
@@ -224,41 +246,59 @@ function calculateCabinetSetup() {
     if (totalWidth === 0) return;
 
     const scale = 0.18;
-    const wScaled = totalWidth * scale, hScaled = totalHeight * scale, dScaled = totalDepth * scale, thkScaled = thk * scale, kickScaled = kickHeight * scale, backThkScaled = backThk * scale;
+    const wScaled = totalWidth * scale, hScaled = totalHeight * scale, dScaled = totalDepth * scale, thkScaled = thk * scale, kickScaled = kickHeight * scale;
 
     stage.style.width = `${wScaled}px`;
     stage.style.height = `${hScaled}px`;
+    stage.style.transformStyle = "preserve-3d";
 
-    function renderHardwareAsset(parentHTML, styleVal, isVertical = false) {
+    // REALISTIC 3D HARDWARE GENERATION ENGINE
+    function renderHardwareAsset(parentHTML, styleVal, sizeMm, isVertical = false) {
+        if (styleVal === "none") return parentHTML;
         let hardwareHTML = parentHTML;
-        let color = "#111"; 
-        if (styleVal.includes("chrome") || styleVal.includes("silver")) color = "#d1d5db";
-        if (styleVal.includes("gold") || styleVal.includes("brushed")) color = "#d4af37";
+        let hexColor = "#111111"; 
+        if (styleVal.includes("chrome") || styleVal.includes("silver")) hexColor = "#e2e8f0";
+        if (styleVal.includes("gold") || styleVal.includes("brushed")) hexColor = "#d4af37";
+
+        const sizeScaled = sizeMm * scale;
 
         if (styleVal.startsWith("bar-")) {
-            hardwareHTML += isVertical 
-                ? `<div style="position: absolute; right: 20px; top: calc(50% - 70px); width: 8px; height: 140px; background: ${color}; border-radius: 2px; transform: translateZ(2px); box-shadow: 1px 1px 3px rgba(0,0,0,0.3);"></div>`
-                : `<div style="position: absolute; left: calc(50% - 60px); top: calc(50% - 4px); width: 120px; height: 8px; background: ${color}; border-radius: 2px; transform: translateZ(2px); box-shadow: 1px 1px 3px rgba(0,0,0,0.3);"></div>`;
-        } else if (styleVal.startsWith("knob-")) {
-            hardwareHTML += `<div style="position: absolute; ${isVertical ? 'right: 20px; top: calc(50% - 7px);' : 'left: calc(50% - 7px); top: calc(50% - 7px);'} width: 14px; height: 14px; background: ${color}; border-radius: 50%; transform: translateZ(2px); box-shadow: 1px 1px 2px rgba(0,0,0,0.4);"></div>`;
+            if (isVertical) {
+                hardwareHTML += `
+                    <div style="position: absolute; right: 25px; top: calc(50% - ${sizeScaled/2}px); width: 8px; height: ${sizeScaled}px; transform-style: preserve-3d; transform: translateZ(1px);">
+                        <!-- Left Standoff Post -->
+                        <div style="position: absolute; top: 10px; left: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateX(90deg); transform-origin: top;"></div>
+                        <!-- Right Standoff Post -->
+                        <div style="position: absolute; bottom: 10px; left: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateX(90deg); transform-origin: top;"></div>
+                        <!-- Main Front Pull Bar Face -->
+                        <div style="position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: ${hexColor}; transform: translateZ(10px); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); border-radius: 2px;"></div>
+                    </div>`;
+            } else {
+                hardwareHTML += `
+                    <div style="position: absolute; left: calc(50% - ${sizeScaled/2}px); top: calc(50% - 4px); width: ${sizeScaled}px; height: 8px; transform-style: preserve-3d; transform: translateZ(1px);">
+                        <!-- Top Standoff Post -->
+                        <div style="position: absolute; left: 10px; top: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateY(90deg); transform-origin: left;"></div>
+                        <!-- Bottom Standoff Post -->
+                        <div style="position: absolute; right: 10px; top: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateY(90deg); transform-origin: left;"></div>
+                        <!-- Main Front Pull Bar Face -->
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: ${hexColor}; transform: translateZ(10px); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); border-radius: 2px;"></div>
+                    </div>`;
+            }
         } else if (styleVal === "cup-antique") {
-            hardwareHTML += `<div style="position: absolute; left: calc(50% - 20px); top: calc(50% - 10px); width: 40px; height: 20px; background: #4a4a4a; border-radius: 20px 20px 0 0; transform: translateZ(2px); box-shadow: 1px 1px 2px rgba(0,0,0,0.4);"></div>`;
-        } else if (styleVal.startsWith("edge-lip-")) {
-            hardwareHTML += isVertical
-                ? `<div style="position: absolute; right: 0; top: 20%; width: 4px; height: 160px; background: ${color}; transform: translateZ(1px);"></div>`
-                : `<div style="position: absolute; left: 0; top: 0; width: 100%; height: 4px; background: ${color}; transform: translateZ(1px);"></div>`;
+            hardwareHTML += `<div style="position: absolute; left: calc(50% - 22px); top: calc(50% - 11px); width: 44px; height: 22px; background: #332211; border-radius: 22px 22px 0 0; transform: translateZ(6px); box-shadow: 1px 2px 4px rgba(0,0,0,0.5); border: 1px solid #1a0c02;"></div>`;
         }
         return hardwareHTML;
     }
 
-    function create3DBlock(x, y, z, w, h, d, colorClass, borderHex = '#cbd5e1', contentHTML = '') {
+    function create3DBlock(x, y, z, w, h, d, colorClass, borderHex = '#cbd5e1', contentHTML = '', isBackPanel = false) {
         const block = document.createElement("div");
         block.className = `panel-3d ${colorClass}`;
         block.style.width = `${w}px`; block.style.height = `${h}px`; block.style.position = "absolute";
         block.style.left = `${x}px`; block.style.top = `${y}px`; block.style.transform = `translate3d(0, 0, ${z}px)`;
         block.style.transformStyle = "preserve-3d";
 
-        const faces = [
+        // CRITICAL DEPTH SORTING REPAIR: Back panel uses localized flat geometry to prevent rear duplication illusions
+        const faces = isBackPanel ? [{ t: `translate3d(0,0,1px)`, w, h }] : [
             { t: `translate3d(0,0,${d}px)`, w, h }, { t: `rotateY(180deg)`, w, h },
             { t: `rotateY(-90deg)`, w: d, h, o: 'left' }, { t: `rotateY(90deg) translate3d(0,0,${w}px)`, w: d, h, o: 'left' },
             { t: `rotateX(90deg)`, w, h: d, o: 'top' }, { t: `rotateX(-90deg) translate3d(0,0,${h}px)`, w, h: d, o: 'top' }
@@ -278,23 +318,21 @@ function calculateCabinetSetup() {
         stage.appendChild(block);
     }
 
-    // Colors mapping setup
-    const isMasonite = backMat.toLowerCase().includes("masonite");
     const carcassColorClass = `color-${carcassMat.toLowerCase().replace(/ /g, "-")}`;
     const faceColorClass = `color-${faceMat.toLowerCase().replace(/ /g, "-")}`;
-    const backColorClass = isMasonite ? 'color-esperanza-oak' : `color-${backMat.toLowerCase().replace(/ /g, "-")}`;
+    const backColorClass = backMat.toLowerCase().includes("masonite") ? 'color-natural-oak' : `color-${backMat.toLowerCase().replace(/ /g, "-")}`;
 
     const internalHeight = totalHeight - kickHeight - thk;
     
-    // Core Frame Construction - Cleaned up to sit completely flush
+    // Core Outer Box Layout
     create3DBlock(thkScaled, (totalHeight - kickHeight - thk) * scale, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
     create3DBlock(thkScaled, (totalHeight - kickHeight) * scale, thkScaled, wScaled - (thkScaled * 2), kickScaled, thkScaled, carcassColorClass);
     create3DBlock(0, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
     create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
     create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
     
-    // BACK PANEL FIX: Snaps flush inside the rear alignment grid (Z = 0) with no extra depth projection
-    create3DBlock(thkScaled, thkScaled, 0, wScaled - (thkScaled * 2), (internalHeight - thk) * scale, backThkScaled, backColorClass);
+    // LOCKED REAR BOUNDARY MAPPING (Stops all ghosting overlaps out the back profile)
+    create3DBlock(thkScaled, thkScaled, 2, wScaled - (thkScaled * 2), (internalHeight - thk) * scale, 1, backColorClass, '#a3a3a3', '', true);
 
     let currentX = thk;
     activeModules.forEach((mod, index) => {
@@ -309,7 +347,7 @@ function calculateCabinetSetup() {
             create3DBlock((currentX + 4) * scale, (thk + 60) * scale, (totalDepth / 2) * scale, (mod.width - thk - 8) * scale, 15 * scale, 15 * scale, "color-folkstone-grey", "#666");
         }
 
-        // Isolated Drawer Rendering loop
+        // Drawers Box Block Implementation
         let structuralFloorY = totalHeight - kickHeight - thk;
         if (mod.drawersCount > 0) {
             const drawerUnitHeight = 160;
@@ -317,14 +355,8 @@ function calculateCabinetSetup() {
                 const curDrawerY = structuralFloorY - ((i + 1) * drawerUnitHeight);
                 
                 if (mod.drawerType === "external") {
-                    let frontHTML = '';
-                    if (mod.doorStyle === "shaker") {
-                        frontHTML = `<div style="border: 4px solid rgba(0,0,0,0.12); width: 100%; height: 100%; box-sizing: border-box; transformStyle: preserve-3d;"></div>`;
-                    } else {
-                        frontHTML = `<div style="border: 1px solid rgba(0,0,0,0.05); width: 100%; height: 100%; box-sizing: border-box; transformStyle: preserve-3d;"></div>`;
-                    }
-                    
-                    frontHTML = renderHardwareAsset(frontHTML, mod.drawerHandle, false);
+                    let frontHTML = `<div style="width: 100%; height: 100%; ${mod.doorStyle === 'shaker' ? 'border: 4px solid rgba(0,0,0,0.12);' : 'border: 1px solid rgba(0,0,0,0.05);'} box-sizing: border-box; transform-style: preserve-3d;"></div>`;
+                    frontHTML = renderHardwareAsset(frontHTML, mod.drawerHandle, mod.drawerHandleSize, false);
                     create3DBlock((currentX + 2) * scale, curDrawerY * scale, dScaled, (mod.width - thk - 4) * scale, (drawerUnitHeight - 4) * scale, thkScaled, faceColorClass, '#111', frontHTML);
                 } else {
                     create3DBlock((currentX + 15) * scale, (curDrawerY + 20) * scale, (thk * 2) * scale, (mod.width - thk - 30) * scale, 100 * scale, (totalDepth - thk - 50) * scale, "color-folkstone-grey");
@@ -332,7 +364,7 @@ function calculateCabinetSetup() {
             }
         }
 
-        // Shelves
+        // Internal Shelving
         if (mod.shelvesCount > 0) {
             let spaceTop = thk + (mod.type === "wardrobe" ? 300 : 40);
             let spaceBottom = mod.drawersCount > 0 ? (totalHeight - kickHeight - thk - (mod.drawersCount * 160)) : (totalHeight - kickHeight - thk);
@@ -344,7 +376,7 @@ function calculateCabinetSetup() {
             }
         }
 
-        // Doors Loop
+        // Doors Loop with Colors Selection Integration
         if (mod.doorsCount > 0) {
             const doorGap = 2;
             const doorWidth = (mod.doorsCount === 2) ? ((mod.width - thk) / 2) - (doorGap * 1.5) : (mod.width - thk) - (doorGap * 2);
@@ -355,14 +387,19 @@ function calculateCabinetSetup() {
                 let frontHTML = '';
 
                 if (mod.doorStyle === "shaker") {
-                    frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.06); width: 100%; height: 100%; box-sizing: border-box; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12); transformStyle: preserve-3d;"></div>`;
+                    frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.06); width: 100%; height: 100%; box-sizing: border-box; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12); transform-style: preserve-3d;"></div>`;
                 } else if (mod.doorStyle === "aluminium-glass") {
-                    frontHTML = `<div style="border: 14px solid #4a5568; width: 100%; height: 100%; box-sizing: border-box; background: rgba(150, 200, 220, 0.25); backdrop-filter: blur(0.5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); transformStyle: preserve-3d;"></div>`;
+                    let frameHex = "#4a5568"; // Default Natural Silver Anodized
+                    if (mod.alumColor === "black") frameHex = "#1a1a1a";
+                    if (mod.alumColor === "gold") frameHex = "#c5a059";
+                    if (mod.alumColor === "champagne") frameHex = "#8c7662";
+
+                    frontHTML = `<div style="border: 14px solid ${frameHex}; width: 100%; height: 100%; box-sizing: border-box; background: rgba(160, 210, 230, 0.22); backdrop-filter: blur(0.5px); box-shadow: inset 0 0 12px rgba(0,0,0,0.25); transform-style: preserve-3d;"></div>`;
                 } else {
-                    frontHTML = `<div style="width: 100%; height: 100%; transformStyle: preserve-3d;"></div>`;
+                    frontHTML = `<div style="width: 100%; height: 100%; transform-style: preserve-3d;"></div>`;
                 }
 
-                frontHTML = renderHardwareAsset(frontHTML, mod.doorHandle, true);
+                frontHTML = renderHardwareAsset(frontHTML, mod.doorHandle, mod.doorHandleSize, true);
                 create3DBlock(doorX * scale, spaceTop * scale, dScaled + 1, doorWidth * scale, mod.doorHeight * scale, thkScaled, (mod.doorStyle === "aluminium-glass" ? "color-iceberg-white" : faceColorClass), '#111', frontHTML);
             }
         }
@@ -400,8 +437,8 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
     activeModules.forEach((mod, idx) => {
         if (mod.doorsCount > 0) {
             const doorW = (mod.doorsCount === 2) ? ((mod.width - T) / 2) - 4 : (mod.width - T) - 4;
-            const styleLabel = mod.doorStyle === "aluminium-glass" ? "Aluminium Glass Frame" : "Standard Face";
-            faceParts.push({ name: `Unit ${idx + 1} Door Facings (${styleLabel})`, qty: mod.doorsCount, len: mod.doorHeight, wid: doorW, mat: mod.doorStyle === "aluminium-glass" ? "Aluminium Frame Profiles" : faceMat });
+            const styleLabel = mod.doorStyle === "aluminium-glass" ? `Aluminium Frame (${mod.alumColor.toUpperCase()})` : "Standard Face";
+            faceParts.push({ name: `Unit ${idx + 1} Door Facings`, qty: mod.doorsCount, len: mod.doorHeight, wid: doorW, mat: mod.doorStyle === "aluminium-glass" ? "Aluminium Profile Extrusions" : faceMat });
         }
         if (mod.drawersCount > 0 && mod.drawerType === "external") {
             faceParts.push({ name: `Unit ${idx + 1} Drawer Fronts`, qty: mod.drawersCount, len: 156, wid: mod.width - T - 4, mat: faceMat });
