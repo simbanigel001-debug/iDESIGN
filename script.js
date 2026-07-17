@@ -1,8 +1,8 @@
 /**
- * Unified 3D Cabinet Fabrication Script Architecture
+ * Unified 3D Cabinet Configurator Script Engine
+ * Added: Per-Unit Material Overrides
  */
 
-// Isolated parameter storage state
 let modules = [
     { 
         id: 1, 
@@ -18,23 +18,27 @@ let modules = [
         doorHandle: "bar-black",
         doorHandleSize: 160,
         doorHeight: 1400,
-        alumColor: "silver"
+        alumColor: "black",
+        glassType: "clear",
+        carcassOverride: "global",
+        faceOverride: "global"
     }
 ];
 
-// Interactive space coordinates
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
 let rotation = { x: -15, y: -20 };
-const scale = 0.18; // Shared viewport standard conversion sizing multiplier
+const scale = 0.18; 
 
-// HTML component catalogs
+// FULL RESTORED HARDWARE CATALOG
 const handleCatalogOptions = `
     <option value="none">Tip-On / Push-to-Open</option>
     <option value="bar-black">Matte Black Pull Bar</option>
     <option value="bar-chrome">Polished Chrome Pull Bar</option>
     <option value="bar-brushed">Brushed Brass Pull Bar</option>
     <option value="cup-antique">Antique Bin Cup Pull</option>
+    <option value="knob-modern">Modern Minimalist Knob</option>
+    <option value="finger-pull">Integrated J-Pull / Finger Grip</option>
 `;
 
 const handleSizeOptions = `
@@ -56,7 +60,6 @@ function setupEventHandlers() {
     document.getElementById("add-unit-btn").addEventListener("click", addNewModule);
     document.getElementById("generate-btn").addEventListener("click", calculateCabinetSetup);
     
-    // Automatic backing thickness adjust sync based on choice
     document.getElementById("backMaterial").addEventListener("change", function() {
         const selectedOpt = this.options[this.selectedIndex];
         const defaultThick = selectedOpt.getAttribute("data-thick");
@@ -79,7 +82,7 @@ function setup3DViewportEngine() {
         const delta = { x: x - previousMousePosition.x, y: y - previousMousePosition.y };
         rotation.y += delta.x * 0.4;
         rotation.x -= delta.y * 0.4;
-        rotation.x = Math.max(-60, Math.min(60, rotation.x)); // cap vertical flip
+        rotation.x = Math.max(-60, Math.min(60, rotation.x));
         stage.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`;
         previousMousePosition = { x, y };
     };
@@ -87,7 +90,6 @@ function setup3DViewportEngine() {
     viewport.addEventListener("mousedown", (e) => startRotation(e.clientX, e.clientY));
     window.addEventListener("mouseup", () => isDragging = false);
     window.addEventListener("mousemove", (e) => processRotation(e.clientX, e.clientY));
-    
     viewport.addEventListener("touchstart", (e) => startRotation(e.touches[0].clientX, e.touches[0].clientY));
     window.addEventListener("touchend", () => isDragging = false);
     window.addEventListener("touchmove", (e) => processRotation(e.touches[0].clientX, e.touches[0].clientY));
@@ -98,7 +100,8 @@ function addNewModule() {
     modules.push({ 
         id, type: "shelves", width: 500, shelvesCount: 3, drawersCount: 0, 
         drawerType: "internal", drawerHandle: "none", drawerHandleSize: 160, doorsCount: 1, 
-        doorStyle: "flat", doorHandle: "bar-black", doorHandleSize: 160, doorHeight: 1800, alumColor: "silver"
+        doorStyle: "flat", doorHandle: "bar-black", doorHandleSize: 160, doorHeight: 1800, alumColor: "silver", glassType: "clear",
+        carcassOverride: "global", faceOverride: "global"
     });
     renderControlPanelUI();
     calculateCabinetSetup();
@@ -110,11 +113,11 @@ function removeModule(id) {
     calculateCabinetSetup();
 }
 
-// FIX FOR TYPING INPUT INTERRUPTIONS: Safely cache key parameters without completely wiping elements mid-text entry
 function trackParamInput(id, param, value) {
     const mod = modules.find(m => m.id === id);
     if (mod) {
-        if (["type", "drawerType", "drawerHandle", "doorStyle", "doorHandle", "alumColor"].includes(param)) {
+        // Added carcassOverride and faceOverride to string tracking
+        if (["type", "drawerType", "drawerHandle", "doorStyle", "doorHandle", "alumColor", "glassType", "carcassOverride", "faceOverride"].includes(param)) {
             mod[param] = value;
         } else {
             mod[param] = parseInt(value) || 0;
@@ -139,7 +142,6 @@ function renderControlPanelUI() {
             <div class="input-grid">
                 <div class="input-group">
                     <label>Width (mm)</label>
-                    <!-- Using oninput to silently map values into active state arrays without wiping parent HTML blocks -->
                     <input type="number" value="${mod.width || ''}" placeholder="500" oninput="trackParamInput(${mod.id}, 'width', this.value)">
                 </div>
                 <div class="input-group">
@@ -147,6 +149,20 @@ function renderControlPanelUI() {
                     <select onchange="trackParamInput(${mod.id}, 'type', this.value); renderControlPanelUI();">
                         <option value="shelves" ${mod.type === 'shelves' ? 'selected' : ''}>Shelving Unit</option>
                         <option value="wardrobe" ${mod.type === 'wardrobe' ? 'selected' : ''}>Hanging Wardrobe</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- UNIT SPECIFIC CARCASS/BOARD OVERRIDE -->
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Specific Unit Board (Internals/Shelves)</label>
+                    <select onchange="trackParamInput(${mod.id}, 'carcassOverride', this.value); renderControlPanelUI();">
+                        <option value="global" ${mod.carcassOverride === 'global' ? 'selected' : ''}>-- Match Global Carcass --</option>
+                        <option value="White Melamine Peen" ${mod.carcassOverride === 'White Melamine Peen' ? 'selected' : ''}>White Melamine Peen</option>
+                        <option value="Folkstone Grey" ${mod.carcassOverride === 'Folkstone Grey' ? 'selected' : ''}>Folkstone Grey</option>
+                        <option value="Super Black" ${mod.carcassOverride === 'Super Black' ? 'selected' : ''}>Melawood Super Black</option>
+                        <option value="Iceberg White" ${mod.carcassOverride === 'Iceberg White' ? 'selected' : ''}>Melawood Iceberg White</option>
                     </select>
                 </div>
             </div>
@@ -211,6 +227,33 @@ function renderControlPanelUI() {
                 </div>
             </div>
 
+            <!-- UNIT SPECIFIC DOOR/DRAWER OVERRIDE -->
+            <div class="input-grid" ${(mod.doorsCount > 0 || mod.drawersCount > 0) && mod.doorStyle !== 'aluminium-glass' ? '' : 'style="display:none;"'}>
+                <div class="input-group">
+                    <label>Specific Door/Drawer Material</label>
+                    <select onchange="trackParamInput(${mod.id}, 'faceOverride', this.value); renderControlPanelUI();">
+                        <option value="global" ${mod.faceOverride === 'global' ? 'selected' : ''}>-- Match Global Facings --</option>
+                        <option value="Super Black" ${mod.faceOverride === 'Super Black' ? 'selected' : ''}>Melawood Super Black</option>
+                        <option value="Iceberg White" ${mod.faceOverride === 'Iceberg White' ? 'selected' : ''}>Melawood Iceberg White</option>
+                        <option value="White Melamine Peen" ${mod.faceOverride === 'White Melamine Peen' ? 'selected' : ''}>White Melamine Peen</option>
+                        <option value="Folkstone Grey" ${mod.faceOverride === 'Folkstone Grey' ? 'selected' : ''}>Folkstone Grey</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- GLASS SELECTION ENTRY VIEWPORT SYSTEM -->
+            <div class="input-grid" ${mod.doorsCount > 0 && mod.doorStyle === 'aluminium-glass' ? '' : 'style="display:none;"'}>
+                <div class="input-group" style="flex: 1;">
+                    <label>Glass Surface Type</label>
+                    <select class="sel-gt" onchange="trackParamInput(${mod.id}, 'glassType', this.value)">
+                        <option value="clear">Clear Transparent Glass</option>
+                        <option value="bronze">Tinted Bronze Glass</option>
+                        <option value="black">Tinted Dark Black Glass</option>
+                        <option value="frosted">Frosted Opaque Glass</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="input-grid" ${mod.doorsCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
                     <label>Door Hardware Pull</label>
@@ -228,7 +271,6 @@ function renderControlPanelUI() {
         `;
         listContainer.appendChild(card);
 
-        // Pre-fill lists state parameters safely
         if (mod.drawersCount > 0) {
             card.querySelector(".sel-drh").value = mod.drawerHandle;
             card.querySelector(".sel-drs").value = mod.drawerHandleSize;
@@ -236,6 +278,9 @@ function renderControlPanelUI() {
         if (mod.doorsCount > 0) {
             card.querySelector(".sel-dh").value = mod.doorHandle;
             card.querySelector(".sel-dsz").value = mod.doorHandleSize;
+            if (mod.doorStyle === 'aluminium-glass') {
+                card.querySelector(".sel-gt").value = mod.glassType || "clear";
+            }
         }
     });
 
@@ -247,7 +292,6 @@ function calculateCabinetSetup() {
     if (!stage) return;
     stage.innerHTML = "";
 
-    // Form inputs state acquisition
     const getVal = (id, fallback) => { const el = document.getElementById(id); return el ? (parseInt(el.value) || fallback) : fallback; };
     const getStr = (id, fallback) => { const el = document.getElementById(id); return el ? el.value : fallback; };
 
@@ -255,34 +299,32 @@ function calculateCabinetSetup() {
     const kickHeight = getVal("kickHeight", 100), backThk = getVal("backThickness", 16);
     const carcassMat = getStr("carcassMaterial", "White Melamine Peen"), faceMat = getStr("faceMaterial", "Super Black"), backMat = getStr("backMaterial", "White Melamine Peen");
     const exposedSides = getStr("exposedPanels", "none");
+    const exposedSidesMat = getStr("exposedSidesMaterial", "Super Black");
     const plinthMaterialType = getStr("plinthMaterial", "matching");
 
     let activeModules = modules.map(m => ({...m, width: m.width || 500}));
     let totalWidth = activeModules.reduce((sum, m) => sum + m.width, 0);
     if (totalWidth === 0) return;
 
-    // Viewport scaling limits processing
     const wScaled = totalWidth * scale, hScaled = totalHeight * scale, dScaled = totalDepth * scale, thkScaled = thk * scale, kickScaled = kickHeight * scale;
     const backThkScaled = backThk * scale;
 
     stage.style.width = `${wScaled}px`;
     stage.style.height = `${hScaled}px`;
 
-    // 3D Block Element Generation Factory
     function create3DBlock(x, y, z, w, h, d, colorClass, borderHex = '#475569', contentHTML = '') {
         const block = document.createElement("div");
         block.className = `panel-3d color-${colorClass.toLowerCase().replace(/ /g, "-")}`;
         block.style.width = `${w}px`; block.style.height = `${h}px`;
         block.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
 
-        // Setup clear distinct side mappings using correct CSS translation loops
         const faces = [
-            { t: `translate3d(0,0,${d}px)`, w, h }, // Front Face
-            { t: `rotateY(180deg)`, w, h }, // Back Face
-            { t: `rotateY(-90deg)`, w: d, h, o: 'left' }, // Left Face
-            { t: `rotateY(90deg) translate3d(0,0,${w}px)`, w: d, h, o: 'left' }, // Right Face
-            { t: `rotateX(90deg)`, w, h: d, o: 'top' }, // Top Face
-            { t: `rotateX(-90deg) translate3d(0,0,${h}px)`, w, h: d, o: 'top' } // Bottom Face
+            { t: `translate3d(0,0,${d}px)`, w, h }, 
+            { t: `rotateY(180deg)`, w, h }, 
+            { t: `rotateY(-90deg)`, w: d, h, o: 'left' }, 
+            { t: `rotateY(90deg) translate3d(0,0,${w}px)`, w: d, h, o: 'left' }, 
+            { t: `rotateX(90deg)`, w, h: d, o: 'top' }, 
+            { t: `rotateX(-90deg) translate3d(0,0,${h}px)`, w, h: d, o: 'top' } 
         ];
 
         faces.forEach((f, idx) => {
@@ -326,53 +368,52 @@ function calculateCabinetSetup() {
             }
         } else if (styleVal === "cup-antique") {
             hardwareHTML += `<div style="position: absolute; left: calc(50% - 20px); top: calc(50% - 10px); width: 40px; height: 20px; background: #332211; border-radius: 20px 20px 0 0; transform: translateZ(6px); box-shadow: 1px 2px 4px rgba(0,0,0,0.5);"></div>`;
+        } else if (styleVal === "knob-modern") {
+            hardwareHTML += `<div style="position: absolute; right: 22px; top: 50%; width: 10px; height: 10px; background: ${hexColor}; border-radius: 50%; transform: translateZ(12px); box-shadow: 1px 1px 3px rgba(0,0,0,0.4);"></div>`;
         }
         return hardwareHTML;
     }
 
     const internalHeight = totalHeight - kickHeight - thk;
 
-    // STEP 1: FIXING THE BACKING PANEL PROTRUSION
-    // By nesting the back panel precisely inside the structural depth grid bounds (starting at z=0 and moving forward out the thickness width), it remains locked flush.
-    create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), internalHeight * scale, backThkScaled, backMat, '#94a3b8');
+    create3DBlock(thkScaled, 0, 1, wScaled - (thkScaled * 2), internalHeight * scale, backThkScaled, backMat, '#94a3b8');
 
-    // STEP 2: Render Carcass Shell Framework offset right after backing board depth position
-    create3DBlock(thkScaled, internalHeight * scale, backThkScaled, wScaled - (thkScaled * 2), thkScaled, dScaled - backThkScaled, carcassMat); // Bottom Plate
-    create3DBlock(thkScaled, 0, backThkScaled, wScaled - (thkScaled * 2), thkScaled, dScaled - backThkScaled, carcassMat); // Top Plate
-    create3DBlock(0, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassMat); // Left Outer Gable Wall
-    create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassMat); // Right Outer Gable Wall
+    // Main Structural Outer Carcass Frame
+    create3DBlock(thkScaled, internalHeight * scale, backThkScaled, wScaled - (thkScaled * 2), thkScaled, dScaled - backThkScaled, carcassMat); 
+    create3DBlock(thkScaled, 0, backThkScaled, wScaled - (thkScaled * 2), thkScaled, dScaled - backThkScaled, carcassMat); 
+    create3DBlock(0, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassMat); 
+    create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassMat); 
 
-    // STEP 3: Handle Decorative Exposed End Side Panels Options Selection
     if (exposedSides === "left" || exposedSides === "both") {
-        create3DBlock(-thkScaled, 0, 0, thkScaled, (internalHeight + thk) * scale, dScaled + 1, faceMat, '#111');
+        create3DBlock(-thkScaled, 0, 0, thkScaled, (internalHeight + thk) * scale, dScaled + 1, exposedSidesMat, '#111');
     }
     if (exposedSides === "right" || exposedSides === "both") {
-        create3DBlock(wScaled, 0, 0, thkScaled, (internalHeight + thk) * scale, dScaled + 1, faceMat, '#111');
+        create3DBlock(wScaled, 0, 0, thkScaled, (internalHeight + thk) * scale, dScaled + 1, exposedSidesMat, '#111');
     }
 
-    // STEP 4: Render Unified Front Decorative Plinth Track Across Frame Width
-    let plinthColor = carcassMat;
+    let plinthColor = carcassMat; 
+    if (plinthMaterialType === "matching") plinthColor = faceMat; 
     if (plinthMaterialType === "silver-alum") plinthColor = "Folkstone Grey";
     if (plinthMaterialType === "black-alum") plinthColor = "Super Black";
     create3DBlock(0, (totalHeight - kickHeight) * scale, dScaled - thkScaled, wScaled, kickScaled, thkScaled, plinthColor, '#334155');
 
-    // STEP 5: Cycle Modules Sections Layout Calculations
     let currentX = thk;
     activeModules.forEach((mod, index) => {
+        // Resolve Module Specific Overrides Here
+        const unitCarcass = (mod.carcassOverride && mod.carcassOverride !== "global") ? mod.carcassOverride : carcassMat;
+        const unitFace = (mod.faceOverride && mod.faceOverride !== "global") ? mod.faceOverride : faceMat;
+
         const modInnerWScaled = (mod.width - thk) * scale;
         const modLeftScaled = currentX * scale;
 
-        // Internal division dividing walls setup
         if (index < activeModules.length - 1) {
             create3DBlock((currentX + mod.width - thk) * scale, thkScaled, backThkScaled, thkScaled, (internalHeight - thk) * scale, dScaled - backThkScaled, carcassMat);
         }
 
-        // Hanging rail layout for wardrobe profiles configuration
         if (mod.type === "wardrobe") {
             create3DBlock((currentX + 4) * scale, (thk + 60) * scale, (totalDepth / 2) * scale, (mod.width - thk - 8) * scale, 12 * scale, 12 * scale, "Folkstone Grey", "#64748b");
         }
 
-        // Drawers mapping matrix rendering logic
         let structuralFloorY = totalHeight - kickHeight - thk;
         if (mod.drawersCount > 0) {
             const drawerUnitHeight = 160;
@@ -381,12 +422,12 @@ function calculateCabinetSetup() {
                 if (mod.drawerType === "external") {
                     let frontHTML = `<div style="width: 100%; height: 100%; ${mod.doorStyle === 'shaker' ? 'border: 4px solid rgba(0,0,0,0.1);' : 'border: 1px solid rgba(0,0,0,0.05);'} box-sizing: border-box; transform-style: preserve-3d;"></div>`;
                     frontHTML = renderHardwareAsset(frontHTML, mod.drawerHandle, mod.drawerHandleSize, false);
-                    create3DBlock((currentX + 2) * scale, curDrawerY * scale, dScaled, (mod.width - thk - 4) * scale, (drawerUnitHeight - 4) * scale, thkScaled, faceMat, '#111', frontHTML);
+                    // Renders drawer using specific unitFace
+                    create3DBlock((currentX + 2) * scale, curDrawerY * scale, dScaled, (mod.width - thk - 4) * scale, (drawerUnitHeight - 4) * scale, thkScaled, unitFace, '#111', frontHTML);
                 }
             }
         }
 
-        // Shelves spacing computations allocation
         if (mod.shelvesCount > 0) {
             let spaceTop = thk + (mod.type === "wardrobe" ? 300 : 40);
             let spaceBottom = mod.drawersCount > 0 ? (totalHeight - kickHeight - thk - (mod.drawersCount * 160)) : (totalHeight - kickHeight - thk);
@@ -394,11 +435,11 @@ function calculateCabinetSetup() {
             let interval = availableH / (mod.shelvesCount + 1);
 
             for (let s = 1; s <= mod.shelvesCount; s++) {
-                create3DBlock(modLeftScaled, (spaceTop + (interval * s)) * scale, backThkScaled + thkScaled, modInnerWScaled, thkScaled, dScaled - backThkScaled - thkScaled, carcassMat);
+                // Renders shelf using specific unitCarcass
+                create3DBlock(modLeftScaled, (spaceTop + (interval * s)) * scale, backThkScaled + thkScaled, modInnerWScaled, thkScaled, dScaled - backThkScaled - thkScaled, unitCarcass);
             }
         }
 
-        // Structural door front assemblies placement loops
         if (mod.doorsCount > 0) {
             const doorGap = 2;
             const doorWidth = (mod.doorsCount === 2) ? ((mod.width - thk) / 2) - (doorGap * 1.5) : (mod.width - thk) - (doorGap * 2);
@@ -410,34 +451,36 @@ function calculateCabinetSetup() {
                 if (mod.doorStyle === "shaker") {
                     frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.05); width: 100%; height: 100%; box-sizing: border-box; transform-style: preserve-3d;"></div>`;
                 } else if (mod.doorStyle === "aluminium-glass") {
-                    let frameHex = "#64748b"; // default anodized silver line representation
+                    let frameHex = "#64748b"; 
                     if (mod.alumColor === "black") frameHex = "#1e293b";
                     if (mod.alumColor === "gold") frameHex = "#d97706";
-                    frontHTML = `<div style="border: 12px solid ${frameHex}; width: 100%; height: 100%; box-sizing: border-box; background: rgba(147, 197, 253, 0.2); transform-style: preserve-3d;"></div>`;
+                    
+                    const glassStyleClass = `glass-${mod.glassType || 'clear'}`;
+                    frontHTML = `<div class="${glassStyleClass}" style="border: 12px solid ${frameHex}; width: 100%; height: 100%; box-sizing: border-box; transform-style: preserve-3d;"></div>`;
                 } else {
                     frontHTML = `<div style="width: 100%; height: 100%; transform-style: preserve-3d;"></div>`;
                 }
 
                 frontHTML = renderHardwareAsset(frontHTML, mod.doorHandle, mod.doorHandleSize, true);
-                create3DBlock(doorX * scale, thk * scale, dScaled + 0.5, doorWidth * scale, mod.doorHeight * scale, thkScaled, (mod.doorStyle === "aluminium-glass" ? "Iceberg White" : faceMat), '#111', frontHTML);
+                // Renders door using specific unitFace
+                create3DBlock(doorX * scale, thk * scale, dScaled + 0.5, doorWidth * scale, mod.doorHeight * scale, thkScaled, (mod.doorStyle === "aluminium-glass" ? "" : unitFace), '#111', frontHTML);
             }
         }
 
         currentX += mod.width - thk;
     });
 
-    generateProductionCutlist(totalHeight, totalDepth, thk, kickHeight, backThk, carcassMat, faceMat, backMat, activeModules, exposedSides, plinthMaterialType);
+    generateProductionCutlist(totalHeight, totalDepth, thk, kickHeight, backThk, carcassMat, faceMat, backMat, activeModules, exposedSides, plinthMaterialType, exposedSidesMat);
 }
 
-function generateProductionCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeModules, exposedSides, plinthMaterialType) {
+function generateProductionCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeModules, exposedSides, plinthMaterialType, exposedSidesMat) {
     const listOutput = document.getElementById("lists-output");
     if (!listOutput) return; listOutput.innerHTML = "";
     let totalWidth = activeModules.reduce((sum, m) => sum + m.width, 0);
 
-    // Assembly tracking arrays initialization
     const carcassParts = [
-        { name: "End Gable (Left Side Profile)", qty: 1, len: H - K - T, wid: D, mat: carcassMat },
-        { name: "End Gable (Right Side Profile)", qty: 1, len: H - K - T, wid: D, mat: carcassMat },
+        { name: "End Gable (Left)", qty: 1, len: H - K - T, wid: D, mat: carcassMat },
+        { name: "End Gable (Right)", qty: 1, len: H - K - T, wid: D, mat: carcassMat },
         { name: "Top Deck Plate Panel", qty: 1, len: totalWidth - (T * 2), wid: D, mat: carcassMat },
         { name: "Bottom Base Plate Panel", qty: 1, len: totalWidth - (T * 2), wid: D, mat: carcassMat }
     ];
@@ -448,36 +491,38 @@ function generateProductionCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat,
 
     activeModules.forEach((mod, idx) => {
         if (mod.shelvesCount > 0) {
-            carcassParts.push({ name: `Unit ${idx + 1} Shelf Inlays`, qty: mod.shelvesCount, len: mod.width - T, wid: D - 20, mat: carcassMat });
+            const unitCarcass = (mod.carcassOverride && mod.carcassOverride !== "global") ? mod.carcassOverride : carcassMat;
+            carcassParts.push({ name: `Unit ${idx + 1} Shelf Inlays`, qty: mod.shelvesCount, len: mod.width - T, wid: D - 20, mat: unitCarcass });
         }
     });
 
-    // Capture Exposed Side Panels into the Carcass Specifications Sheet Matrix
     if (exposedSides === "left" || exposedSides === "both") {
-        carcassParts.push({ name: "Exposed Decorative Side Skin (Left)", qty: 1, len: H - K, wid: D + 2, mat: faceMat });
+        carcassParts.push({ name: "Exposed Decorative Side Skin (Left)", qty: 1, len: H - K, wid: D + 2, mat: exposedSidesMat });
     }
     if (exposedSides === "right" || exposedSides === "both") {
-        carcassParts.push({ name: "Exposed Decorative Side Skin (Right)", qty: 1, len: H - K, wid: D + 2, mat: faceMat });
+        carcassParts.push({ name: "Exposed Decorative Side Skin (Right)", qty: 1, len: H - K, wid: D + 2, mat: exposedSidesMat });
     }
 
     const faceParts = [];
     activeModules.forEach((mod, idx) => {
+        const unitFace = (mod.faceOverride && mod.faceOverride !== "global") ? mod.faceOverride : faceMat;
+
         if (mod.doorsCount > 0) {
             const doorW = (mod.doorsCount === 2) ? ((mod.width - T) / 2) - 4 : (mod.width - T) - 4;
-            faceParts.push({ name: `Unit ${idx + 1} Front Door Facing`, qty: mod.doorsCount, len: mod.doorHeight, wid: doorW, mat: mod.doorStyle === "aluminium-glass" ? `Aluminium Profile Frame (${mod.alumColor})` : faceMat });
+            const subMatStr = mod.doorStyle === "aluminium-glass" ? `Aluminium Frame (${mod.alumColor.toUpperCase()}) + ${mod.glassType.toUpperCase()} Glass` : unitFace;
+            faceParts.push({ name: `Unit ${idx + 1} Front Door Facing`, qty: mod.doorsCount, len: mod.doorHeight, wid: doorW, mat: subMatStr });
         }
         if (mod.drawersCount > 0 && mod.drawerType === "external") {
-            faceParts.push({ name: `Unit ${idx + 1} Ext. Drawer Front Face`, qty: mod.drawersCount, len: 156, wid: mod.width - T - 4, mat: faceMat });
+            faceParts.push({ name: `Unit ${idx + 1} Ext. Drawer Front Face`, qty: mod.drawersCount, len: 156, wid: mod.width - T - 4, mat: unitFace });
         }
     });
 
-    // Append Continuous Structural Front Decorative Plinth Specifications Data
     let plinthSpecString = carcassMat;
-    if (plinthMaterialType === "silver-alum") plinthSpecString = "Brushed Silver Aluminium Kickplate Extrusion Track";
-    if (plinthMaterialType === "black-alum") plinthSpecString = "Matt Black Aluminium Kickplate Extrusion Track";
+    if (plinthMaterialType === "matching") plinthSpecString = faceMat;
+    if (plinthMaterialType === "silver-alum") plinthSpecString = "Brushed Silver Aluminium Kickplate Extrusion";
+    if (plinthMaterialType === "black-alum") plinthSpecString = "Matt Black Aluminium Kickplate Extrusion";
     faceParts.push({ name: "Decorative Continuous Front Base Plinth", qty: 1, len: totalWidth, wid: K, mat: plinthSpecString });
 
-    // Clean Backing Sheet calculations data array output tracking
     const backParts = [{ name: "Rear Backing Sheet Panel", qty: 1, len: H - K - T - 4, wid: totalWidth - (T * 2) - 4, mat: backMat }];
 
     function renderTable(title, parts) {
