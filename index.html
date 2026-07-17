@@ -3,151 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iDESIGN - Modular Cabinet Planner</title>
+    <title>3D Cabinet Configurator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="app-container">
         <!-- Sidebar Controls -->
         <div class="sidebar">
-            <h2>iDESIGN</h2>
-            
-            <h3>Global Dimensions</h3>
+            <h2>Global Dimensions (mm)</h2>
             <div class="input-grid">
                 <div class="input-group">
-                    <label>Height (mm)</label>
-                    <input type="number" id="height" value="2000" oninput="calculateCabinetSetup()">
+                    <label>Total Height</label>
+                    <input type="number" id="height" value="2000">
                 </div>
                 <div class="input-group">
-                    <label>Depth (mm)</label>
-                    <input type="number" id="depth" value="600" oninput="calculateCabinetSetup()">
+                    <label>Total Depth</label>
+                    <input type="number" id="depth" value="600">
                 </div>
             </div>
-            
             <div class="input-grid">
                 <div class="input-group">
-                    <label>Board Thickness (mm)</label>
-                    <input type="number" id="thickness" value="16" oninput="calculateCabinetSetup()">
+                    <label>Carcass Thickness</label>
+                    <input type="number" id="thickness" value="16">
                 </div>
                 <div class="input-group">
-                    <label>Kickplate Height (mm)</label>
-                    <input type="number" id="kickHeight" value="100" oninput="calculateCabinetSetup()">
+                    <label>Floor Kick Height</label>
+                    <input type="number" id="kickHeight" value="100">
                 </div>
             </div>
 
-            <input type="hidden" id="topTrack" value="0">
+            <hr>
 
-            <h3>Materials (PG Bison Melawood)</h3>
-            <div class="input-group" style="margin-bottom: 12px;">
-                <label>Carcass Material</label>
-                <select id="carcassMaterial" onchange="calculateCabinetSetup()">
-                    <optgroup label="Solid Colours">
-                        <option value="White Melamine Peen" selected>White Melamine Peen</option>
-                        <option value="Iceberg White">Iceberg White</option>
-                        <option value="Folkstone Grey">Folkstone Grey</option>
-                        <option value="Storm Grey">Storm Grey</option>
-                        <option value="Super Black">Super Black</option>
-                        <option value="Dunblane Grey">Dunblane Grey</option>
-                    </optgroup>
-                    <optgroup label="Accent Range">
-                        <option value="Kara Blu">Kara Blu</option>
-                        <option value="Petrol Blue">Petrol Blue</option>
-                        <option value="Cappuccino">Cappuccino</option>
-                        <option value="Congo">Congo</option>
-                    </optgroup>
-                    <optgroup label="Woodgrains">
-                        <option value="Coimbra">Coimbra</option>
-                        <option value="Esperanza Oak">Esperanza Oak</option>
-                        <option value="Lanza Oak">Lanza Oak</option>
-                        <option value="Monument Oak">Monument Oak</option>
-                        <option value="Verzasca Oak">Verzasca Oak</option>
-                        <option value="Arden">Arden</option>
-                        <option value="Vardo">Vardo</option>
-                        <option value="Camden">Camden</option>
-                        <option value="Greythorne">Greythorne</option>
-                        <option value="Brookhill">Brookhill</option>
-                        <option value="American Walnut">American Walnut</option>
-                        <option value="Natural Oak">Natural Oak</option>
-                        <option value="Windsor Cherry">Windsor Cherry</option>
-                    </optgroup>
+            <h2>Material Specifications</h2>
+            <div class="input-group">
+                <label>Carcass Finish</label>
+                <select id="carcassMaterial">
+                    <option value="White Melamine Peen" selected>White Melamine Peen</option>
+                    <option value="Folkstone Grey">Folkstone Grey Peen</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Facings / Doors Finish</label>
+                <select id="faceMaterial">
+                    <option value="Super Black" selected>Melawood Super Black</option>
+                    <option value="Iceberg White">Melawood Iceberg White</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Backing Board Material</label>
+                <select id="backMaterial">
+                    <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
+                    <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
+                    <option value="Standard Masonite" data-thick="3">Standard Masonite (3mm)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Backing Thickness (mm)</label>
+                <input type="number" id="backThickness" value="16">
+            </div>
+
+            <hr>
+
+            <h2>Structure Options</h2>
+            <div class="input-group">
+                <label>Exposed Decorative Sides</label>
+                <select id="exposedPanels">
+                    <option value="none" selected>None (Fully Built-In)</option>
+                    <option value="left">Left Side Exposed</option>
+                    <option value="right">Right Side Exposed</option>
+                    <option value="both">Both Sides Exposed</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Front Plinth Style</label>
+                <select id="plinthMaterial">
+                    <option value="matching" selected>Matching Wooden Plinth</option>
+                    <option value="silver-alum">Brushed Silver Aluminium</option>
+                    <option value="black-alum">Matt Black Aluminium</option>
                 </select>
             </div>
 
-            <div class="input-group" style="margin-bottom: 12px;">
-                <label>Door & Front Material</label>
-                <select id="faceMaterial" onchange="calculateCabinetSetup()">
-                    <optgroup label="Solid Colours">
-                        <option value="White Melamine Peen">White Melamine Peen</option>
-                        <option value="Iceberg White">Iceberg White</option>
-                        <option value="Folkstone Grey">Folkstone Grey</option>
-                        <option value="Storm Grey">Storm Grey</option>
-                        <option value="Super Black" selected>Super Black</option>
-                        <option value="Dunblane Grey">Dunblane Grey</option>
-                    </optgroup>
-                    <optgroup label="Accent Range">
-                        <option value="Kara Blu">Kara Blu</option>
-                        <option value="Petrol Blue">Petrol Blue</option>
-                        <option value="Cappuccino">Cappuccino</option>
-                        <option value="Congo">Congo</option>
-                    </optgroup>
-                    <optgroup label="Woodgrains">
-                        <option value="Coimbra">Coimbra</option>
-                        <option value="Esperanza Oak">Esperanza Oak</option>
-                        <option value="Lanza Oak">Lanza Oak</option>
-                        <option value="Monument Oak">Monument Oak</option>
-                        <option value="Verzasca Oak">Verzasca Oak</option>
-                        <option value="Arden">Arden</option>
-                        <option value="Vardo">Vardo</option>
-                        <option value="Camden">Camden</option>
-                        <option value="Greythorne">Greythorne</option>
-                        <option value="Brookhill">Brookhill</option>
-                        <option value="American Walnut">American Walnut</option>
-                        <option value="Natural Oak">Natural Oak</option>
-                        <option value="Windsor Cherry">Windsor Cherry</option>
-                    </optgroup>
-                </select>
-            </div>
+            <hr>
 
-            <div class="input-grid">
-                <div class="input-group">
-                    <label>Backing Material</label>
-                    <select id="backMaterial" onchange="syncBackingThickness()">
-                        <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
-                        <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
-                        <option value="Folkstone Grey" data-thick="9">Folkstone Grey Melamine (9mm)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Back Thickness (mm)</label>
-                    <input type="number" id="backThickness" value="16" readonly>
-                </div>
-            </div>
-
-            <div class="modules-header">
-                <h3>Modular Units</h3>
-                <button class="btn-add" onclick="addNewModule()">+ Add Unit</button>
+            <div class="modules-section-header">
+                <h2>Modular Layout Units</h2>
+                <button class="btn-add" id="add-unit-btn">Add Unit</button>
             </div>
             
-            <div id="modules-list"></div>
-
-            <div id="modular-warning" style="display: none; color: #ef4444; font-size: 12px; margin-top: 10px; font-weight: bold;">
-                ⚠️ Warning: One of your modules exceeds 1000mm width.
+            <div id="modules-list">
+                <!-- Dynamically injected units -->
             </div>
+            
+            <button class="btn-primary" id="generate-btn" style="margin-top: 20px; width: 100%;">Calculate & Render Structure</button>
         </div>
 
-        <!-- Main Workspace Area -->
+        <!-- Main Display Arena -->
         <div class="main-content">
-            <div class="viewport-header">
-                <span id="viewport-badge" class="badge">0 Unit(s) Loaded</span>
+            <div class="viewport-card">
+                <div class="viewport-header">
+                    <span>3D Interactive Matrix Preview</span>
+                    <span class="badge" id="viewport-badge">1 Unit Active</span>
+                </div>
+                <div id="canvas-viewport" class="canvas-viewport">
+                    <div id="stage" class="stage"></div>
+                </div>
+                <div class="helper-text">Click and drag inside viewport to orbit view layout</div>
             </div>
 
-            <div id="canvas-viewport">
-                <div id="stage"></div>
-            </div>
-
-            <div class="cutting-list-container">
-                <h2 style="border-bottom: 2px solid #10b981;">Carcass & Door Cutting List (MaxiCut Ready)</h2>
-                <div id="lists-output"></div>
+            <!-- Cutting List Outputs -->
+            <div class="list-card">
+                <h2>Fabrication Cutting List Specs</h2>
+                <div id="lists-output">
+                    <!-- Tables injected here -->
+                </div>
             </div>
         </div>
     </div>
