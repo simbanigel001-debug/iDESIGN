@@ -3,144 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cabinet Planner</title>
+    <title>iDESIGN - Modular Cabinet Planner</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="app-container">
         <!-- Sidebar Controls -->
         <div class="sidebar">
-            <h2>3D Cabinet Designer</h2>
+            <h2>iDESIGN Setup</h2>
             
-            <div class="settings-panel">
-                <h3>Global Dimensions (mm)</h3>
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label>Total Height</label>
-                        <input type="number" id="height" value="2200" oninput="calculateCabinetSetup()">
-                    </div>
-                    <div class="input-group">
-                        <label>Total Depth</label>
-                        <input type="number" id="depth" value="600" oninput="calculateCabinetSetup()">
-                    </div>
-                </div>
-
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label>Board Thickness</label>
-                        <input type="number" id="thickness" value="16" oninput="calculateCabinetSetup()">
-                    </div>
-                    <div class="input-group">
-                        <label>Kickplate Height</label>
-                        <input type="number" id="kickHeight" value="100" oninput="calculateCabinetSetup()">
-                    </div>
-                </div>
-
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label>Top Track/Fascia</label>
-                        <input type="number" id="topTrack" value="0" oninput="calculateCabinetSetup()">
-                    </div>
-                    <div class="input-group">
-                        <label>Exposed Ends</label>
-                        <select id="exposedSides" onchange="calculateCabinetSetup()">
-                            <option value="both">Both Sides</option>
-                            <option value="left">Left Side Only</option>
-                            <option value="right">Right Side Only</option>
-                            <option value="none">None (Built-in)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <h3>Materials & Finishes</h3>
+            <h3>Global Dimensions</h3>
+            <div class="input-grid">
                 <div class="input-group">
-                    <label>Carcass (Interior)</label>
-                    <select id="carcassMaterial" onchange="calculateCabinetSetup()">
-                        <option value="White Melamine Peen">White Melamine Peen (16mm)</option>
-                        <option value="Folkstone Grey">Folkstone Grey (16mm)</option>
-                        <option value="Storm Grey">Storm Grey (16mm)</option>
-                    </select>
+                    <label>Height (mm)</label>
+                    <input type="number" id="height" value="2000" oninput="calculateCabinetSetup()">
                 </div>
-
                 <div class="input-group">
-                    <label>Facings (Doors/Drawers)</label>
-                    <select id="faceMaterial" onchange="calculateCabinetSetup()">
-                        <option value="Kara Blu">Kara Blu (Melawood)</option>
-                        <option value="Petrol Blue">Petrol Blue (Melawood)</option>
-                        <option value="Super Black">Super Black (Melawood)</option>
-                        <option value="Iceberg White">Iceberg White (Melawood)</option>
-                    </select>
+                    <label>Depth (mm)</label>
+                    <input type="number" id="depth" value="600" oninput="calculateCabinetSetup()">
                 </div>
-
-                <div class="input-grid">
-                    <div class="input-group" style="grid-column: span 2;">
-                        <label>Backing Board Material</label>
-                        <select id="backMaterial" onchange="syncBackingThickness()">
-                            <option value="White Melamine Back" data-thick="16">Melamine Backing (16mm)</option>
-                            <option value="Masonite Back" data-thick="3">Masonite Backing (3mm)</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="display:none;">
-                        <label>Backing (mm)</label>
-                        <input type="number" id="backThickness" value="16" readonly oninput="calculateCabinetSetup()">
-                    </div>
+            </div>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Board Thickness (mm)</label>
+                    <input type="number" id="thickness" value="16" oninput="calculateCabinetSetup()">
                 </div>
-
-                <h3>Style & Aesthetics</h3>
-                <div class="input-grid">
-                    <div class="input-group">
-                        <label>Door Style</label>
-                        <select id="doorStyle" onchange="calculateCabinetSetup()">
-                            <option value="flat">Flat / Slab</option>
-                            <option value="shaker">Shaker-Style</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Handles / Opening</label>
-                        <select id="handleStyle" onchange="calculateCabinetSetup()">
-                            <option value="none">Push-to-Open (No Handles)</option>
-                            <option value="gola">Gola Profile (Integrated)</option>
-                            <option value="bar-black">Modern Black Pull Handles</option>
-                            <option value="bar-silver">Classic Silver T-Bar Handles</option>
-                        </select>
-                    </div>
+                <div class="input-group">
+                    <label>Kickplate Height (mm)</label>
+                    <input type="number" id="kickHeight" value="100" oninput="calculateCabinetSetup()">
                 </div>
             </div>
 
-            <hr>
+            <!-- Set to 0 if no top track profile is used -->
+            <input type="hidden" id="topTrack" value="0">
+
+            <h3>Materials (PG Bison Melawood)</h3>
+            <div class="input-group" style="margin-bottom: 12px;">
+                <label>Carcass Material</label>
+                <select id="carcassMaterial" onchange="calculateCabinetSetup()">
+                    <optgroup label="Solid Colours">
+                        <option value="White Melamine Peen" selected>White Melamine Peen</option>
+                        <option value="Iceberg White">Iceberg White</option>
+                        <option value="Folkstone Grey">Folkstone Grey</option>
+                        <option value="Storm Grey">Storm Grey</option>
+                        <option value="Super Black">Super Black</option>
+                        <option value="Dunblane Grey">Dunblane Grey</option>
+                    </optgroup>
+                    <optgroup label="Accent Range">
+                        <option value="Kara Blu">Kara Blu</option>
+                        <option value="Petrol Blue">Petrol Blue</option>
+                        <option value="Cappuccino">Cappuccino</option>
+                        <option value="Congo">Congo</option>
+                    </optgroup>
+                    <optgroup label="Woodgrains">
+                        <option value="Coimbra">Coimbra</option>
+                        <option value="Esperanza Oak">Esperanza Oak</option>
+                        <option value="Lanza Oak">Lanza Oak</option>
+                        <option value="Monument Oak">Monument Oak</option>
+                        <option value="Verzasca Oak">Verzasca Oak</option>
+                        <option value="Arden">Arden</option>
+                        <option value="Vardo">Vardo</option>
+                        <option value="Camden">Camden</option>
+                        <option value="Greythorne">Greythorne</option>
+                        <option value="Brookhill">Brookhill</option>
+                        <option value="American Walnut">American Walnut</option>
+                        <option value="Natural Oak">Natural Oak</option>
+                        <option value="Windsor Cherry">Windsor Cherry</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 12px;">
+                <label>Door & Front Material</label>
+                <select id="faceMaterial" onchange="calculateCabinetSetup()">
+                    <optgroup label="Solid Colours">
+                        <option value="White Melamine Peen">White Melamine Peen</option>
+                        <option value="Iceberg White">Iceberg White</option>
+                        <option value="Folkstone Grey">Folkstone Grey</option>
+                        <option value="Storm Grey">Storm Grey</option>
+                        <option value="Super Black" selected>Super Black</option>
+                        <option value="Dunblane Grey">Dunblane Grey</option>
+                    </optgroup>
+                    <optgroup label="Accent Range">
+                        <option value="Kara Blu">Kara Blu</option>
+                        <option value="Petrol Blue">Petrol Blue</option>
+                        <option value="Cappuccino">Cappuccino</option>
+                        <option value="Congo">Congo</option>
+                    </optgroup>
+                    <optgroup label="Woodgrains">
+                        <option value="Coimbra">Coimbra</option>
+                        <option value="Esperanza Oak">Esperanza Oak</option>
+                        <option value="Lanza Oak">Lanza Oak</option>
+                        <option value="Monument Oak">Monument Oak</option>
+                        <option value="Verzasca Oak">Verzasca Oak</option>
+                        <option value="Arden">Arden</option>
+                        <option value="Vardo">Vardo</option>
+                        <option value="Camden">Camden</option>
+                        <option value="Greythorne">Greythorne</option>
+                        <option value="Brookhill">Brookhill</option>
+                        <option value="American Walnut">American Walnut</option>
+                        <option value="Natural Oak">Natural Oak</option>
+                        <option value="Windsor Cherry">Windsor Cherry</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Backing selection (Set to Melamine, no Masonite) -->
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Backing Material</label>
+                    <select id="backMaterial" onchange="syncBackingThickness()">
+                        <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
+                        <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
+                        <option value="Folkstone Grey" data-thick="9">Folkstone Grey Melamine (9mm)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Back Thickness (mm)</label>
+                    <input type="number" id="backThickness" value="16" readonly>
+                </div>
+            </div>
+
+            <h3>Styling & Hardware</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Door Profile</label>
+                    <select id="doorStyle" onchange="calculateCabinetSetup()">
+                        <option value="flat">Standard Flat Face</option>
+                        <option value="shaker" selected>Shaker-Style Door</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Handles</label>
+                    <select id="handleStyle" onchange="calculateCabinetSetup()">
+                        <option value="gola">Continuous Gola Channel</option>
+                        <option value="bar-chrome">Modern Chrome Bar</option>
+                        <option value="bar-black" selected>Matte Black Bar</option>
+                        <option value="none">Tip-On / Push-to-Open</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="modules-header">
-                <h3>Modular Units Setup</h3>
+                <h3>Modular Units</h3>
                 <button class="btn-add" onclick="addNewModule()">+ Add Unit</button>
             </div>
             
-            <div id="modular-warning" style="display:none; color: red; font-size: 12px; margin-bottom: 10px;">
-                * Note: Individual unit widths capped at 1000mm.
+            <div id="modules-list">
+                <!-- Javascript builds individual modules here -->
             </div>
 
-            <div id="modules-list">
-                <!-- Modules list renders here dynamically -->
+            <div id="modular-warning" style="display: none; color: #ef4444; font-size: 12px; margin-top: 10px; font-weight: bold;">
+                ⚠️ Warning: One of your modules exceeds 1000mm width. Standard fabrication recommends staying below 1000mm to prevent shelf sagging.
             </div>
         </div>
 
-        <!-- Right Side Viewport & Output Tables -->
+        <!-- Main Workspace Area -->
         <div class="main-content">
             <div class="viewport-header">
-                <span class="viewport-title">3D Visual Preview (Drag to Rotate)</span>
-                <span id="viewport-badge" class="badge">0 Units</span>
+                <span id="viewport-badge" class="badge">0 Unit(s) Loaded</span>
             </div>
 
+            <!-- 3D Viewport Window Container (RESTORED VIEWPORT) -->
             <div id="canvas-viewport">
-                <div id="stage" style="transform: rotateX(-15deg) rotateY(-20deg);">
-                    <!-- 3D panels dynamically render here -->
-                </div>
+                <div id="stage"></div>
             </div>
 
+            <!-- Materials & Cutlist Output Tables -->
             <div class="cutting-list-container">
-                <h2>Carcass & Door Cutting List (MaxiCut Ready)</h2>
+                <h2 style="border-bottom: 2px solid #10b981;">Carcass & Door Cutting List (MaxiCut Ready)</h2>
                 <div id="lists-output">
-                    <!-- Cutlist tables will generate here -->
+                    <!-- Javascript generates the tables here -->
                 </div>
             </div>
         </div>
