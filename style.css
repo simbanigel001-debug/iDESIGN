@@ -23,7 +23,6 @@ body {
     overflow: hidden;
 }
 
-/* Sidebar Styling */
 .sidebar {
     width: 380px;
     background-color: var(--card-dark);
@@ -88,7 +87,6 @@ input:focus, select:focus {
     margin-bottom: 15px;
 }
 
-/* Modular Unit Control Cards */
 .module-card {
     background: var(--bg-dark);
     border: 1px solid var(--border-dark);
@@ -106,7 +104,6 @@ input:focus, select:focus {
     font-size: 13px;
 }
 
-/* Custom Buttons */
 button {
     cursor: pointer;
     font-weight: 500;
@@ -146,7 +143,6 @@ button {
     background: var(--primary-hover);
 }
 
-/* Main Arena Layout */
 .main-content {
     flex: 1;
     padding: 20px;
@@ -178,7 +174,6 @@ button {
     border-radius: 20px;
 }
 
-/* CSS 3D Display Engine Layouts */
 .canvas-viewport {
     width: 100%;
     height: 450px;
@@ -203,18 +198,23 @@ button {
     height: 300px;
 }
 
-/* Essential Clean Panels 3D Engine */
 .panel-3d {
     position: absolute;
     transform-style: preserve-3d;
 }
 
-/* Simulation Textures Palette */
+/* Texture Library Mapping */
 .color-white-melamine-peen { background-color: #f3f4f6; color: #1e293b; }
 .color-folkstone-grey { background-color: #cbd5e1; }
-.color-super-black { background-color: #111827; }
+.color-super-black { background-color: #1a1a1a; }
 .color-iceberg-white { background-color: #ffffff; }
-.color-natural-oak { background-color: #b45309; }
+.color-standard-masonite { background-color: #b45309; }
+
+/* 3D Glass Materials Mapping */
+.glass-clear { background: rgba(147, 197, 253, 0.2); backdrop-filter: blur(0.5px); }
+.glass-bronze { background: rgba(180, 110, 50, 0.35); backdrop-filter: blur(1px); }
+.glass-black { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(1px); }
+.glass-frosted { background: rgba(240, 243, 248, 0.55); backdrop-filter: blur(8px); }
 
 .helper-text {
     text-align: center;
@@ -223,7 +223,6 @@ button {
     margin-top: 10px;
 }
 
-/* Output Data Layouts Matrix */
 table {
     width: 100%;
     border-collapse: collapse;
