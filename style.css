@@ -147,7 +147,11 @@ h3 {
 
 /* 3D Visual Stage Container */
 #canvas-viewport {
+    /* 3D Visual Stage Container (Fixes the squishing/collapsing bug) */
+#canvas-viewport {
     height: 480px;
+    min-height: 480px; /* Forces the viewport to keep its height */
+    flex-shrink: 0;    /* Prevents the cutting lists from squishing it */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,7 +162,7 @@ h3 {
     user-select: none;
 }
 
-#canvas-viewport:active { 
+#canvas-viewport:active {
     cursor: grabbing; 
 }
 
