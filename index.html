@@ -81,9 +81,29 @@
                             <option value="Masonite Back" data-thick="3">Masonite Backing (3mm)</option>
                         </select>
                     </div>
-                    <div class="input-group">
+                    <div class="input-group" style="display:none;">
                         <label>Backing (mm)</label>
                         <input type="number" id="backThickness" value="16" readonly oninput="calculateCabinetSetup()">
+                    </div>
+                </div>
+
+                <h3>Style & Aesthetics</h3>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Door Style</label>
+                        <select id="doorStyle" onchange="calculateCabinetSetup()">
+                            <option value="flat">Flat / Slab</option>
+                            <option value="shaker">Shaker-Style</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Handles / Opening</label>
+                        <select id="handleStyle" onchange="calculateCabinetSetup()">
+                            <option value="none">Push-to-Open (No Handles)</option>
+                            <option value="gola">Gola Profile (Integrated)</option>
+                            <option value="bar-black">Modern Black Pull Handles</option>
+                            <option value="bar-silver">Classic Silver T-Bar Handles</option>
+                        </select>
                     </div>
                 </div>
             </div>
