@@ -1,304 +1,187 @@
-@import "tailwindcss";/* General Page Styling */
+/* Base Page Styling */
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #f4f6f8;
-    color: #222222;
     margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Controls */
+.sidebar {
+    width: 380px;
+    background-color: #1e293b;
+    border-right: 1px solid #334155;
     padding: 20px;
-}
-
-.container {
-    max-width: 1500px;
-    margin: 0 auto;
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 15px;
-}
-
-.logo {
-    width: 45px;
-    height: 45px;
-    background: #222222;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 20px;
-}
-
-.brand h1 {
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-.brand span {
-    font-size: 0.75rem;
-    color: #666666;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Two-column Layout split */
-.main-layout {
-    display: grid;
-    grid-template-columns: 600px 1fr;
-    gap: 30px;
-}
-
-@media (max-width: 1200px) {
-    .main-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-.panel-scroll {
-    max-height: 85vh;
     overflow-y: auto;
-    padding-right: 10px;
+    box-sizing: border-box;
 }
 
-/* Form Settings Layout */
-.section-title {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-top: 25px;
-    margin-bottom: 12px;
-    color: #111111;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+h2, h3 {
+    margin-top: 0;
+    color: #f8fafc;
 }
 
-.section-badge {
-    background-color: #222222;
-    color: #ffffff;
-    font-size: 0.75rem;
-    padding: 3px 8px;
-    border-radius: 12px;
-}
+h2 { border-bottom: 2px solid #3b82f6; padding-bottom: 10px; font-size: 1.4rem; }
+h3 { margin-top: 20px; font-size: 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
 
 .input-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
 
-label {
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #4a5568;
+.input-group label {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 4px;
 }
 
-input, select {
-    padding: 8px 12px;
-    border: 1px solid #cbd5e1;
+.input-group input, .input-group select {
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    color: #f1f5f9;
+    padding: 8px;
     border-radius: 4px;
-    font-size: 0.9rem;
-    background-color: #f8fafc;
+    font-size: 13px;
 }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: #222222;
-    background-color: #ffffff;
-}
-
-/* Dynamic Cabinet Card Settings */
-.modules-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
+/* Module Cards */
 .module-card {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background-color: #0f172a;
+    border: 1px solid #334155;
     border-radius: 6px;
-    padding: 15px;
+    padding: 12px;
+    margin-bottom: 15px;
 }
 
 .module-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    border-bottom: 1px dashed #cbd5e1;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #334155;
     padding-bottom: 6px;
 }
 
-.module-title {
-    font-size: 0.85rem;
+.module-title { font-weight: bold; font-size: 12px; color: #3b82f6; }
+
+/* Buttons */
+.btn-add {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
     font-weight: bold;
-    color: #1e293b;
 }
 
 .btn-delete {
     background-color: #ef4444;
-    color: #ffffff;
+    color: white;
     border: none;
-    padding: 4px 8px;
-    font-size: 0.75rem;
+    padding: 3px 8px;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 11px;
 }
 
-.btn-delete:hover {
-    background-color: #dc2626;
+.modules-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.btn-add-module {
-    background-color: #2563eb;
-    color: #ffffff;
-    border: none;
-    padding: 12px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-.btn-add-module:hover {
-    background-color: #1d4ed8;
-}
-
-.warning-box {
-    background-color: #fffbeb;
-    border-left: 4px solid #f59e0b;
-    color: #b45309;
-    padding: 12px;
-    font-size: 0.8rem;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    display: none;
-}
-
-.btn-rebuild {
-    background-color: #222222;
-    color: #ffffff;
-    border: none;
-    padding: 14px;
-    font-size: 0.95rem;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 15px;
-}
-
-.btn-rebuild:hover {
-    background-color: #444444;
-}
-
-/* 3D Viewport Setup */
-.preview-container {
+/* Main Viewport Areas */
+.main-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    background-color: #090d16;
+    overflow-y: auto;
 }
 
-.preview-tip {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin: 0 0 10px 0;
-}
-
-.preview-box {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-    border: 1px solid #94a3b8;
-    border-radius: 6px;
-    min-height: 550px;
+.viewport-header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: #0f172a;
+    border-bottom: 1px solid #1e293b;
+}
+
+.badge { background-color: #3b82f6; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+
+/* 3D Visual Stage (Critical Fixes) */
+#canvas-viewport {
+    height: 480px;
+    display: flex;
     align-items: center;
-    perspective: 1200px;
-    position: relative;
+    justify-content: center;
+    perspective: 1200px; /* Gives 3D depth context */
     overflow: hidden;
+    background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
     cursor: grab;
 }
 
-.stage-3d {
+#canvas-viewport:active { cursor: grabbing; }
+
+#stage {
     position: relative;
     transform-style: preserve-3d;
-    transform: rotateX(-15deg) rotateY(-20deg);
+    transition: transform 0.1s ease-out;
 }
 
+/* True CSS 3D Box Rendering */
 .panel-3d {
     position: absolute;
     transform-style: preserve-3d;
 }
 
-/* Material styles and colors */
-.mesh-carcass { background-color: #ffffff; border: 1px solid #cbd5e1; }
-.mesh-premium { background-color: #2c3e50; border: 1px solid #1a252f; }
-.mesh-door { background-color: rgba(44, 62, 80, 0.8); border: 1px solid #111111; }
-.mesh-rail { background-color: #cbd5e1; border: 1px solid #94a3b8; border-radius: 10px; }
+.panel-3d > div {
+    position: absolute;
+    background-color: inherit;
+    backface-visibility: visible; /* Allows solid inspection from back angles */
+}
 
-.color-iceberg-white { background-color: #fcfcfc !important; }
-.color-folkstone-grey { background-color: #d0d2cd !important; }
-.color-storm-grey { background-color: #5f5a57 !important; }
-.color-super-black { background-color: #080808 !important; }
-.color-kara-blu { background-color: #647184 !important; }
-.color-petrol-blue { background-color: #1f323a !important; }
-.color-cappuccino { background-color: #e5e0c5 !important; }
-.color-congo { background-color: #aa9b87 !important; }
-.color-masonite { background-color: #5c4033 !important; } 
+/* Materials Coloring styling */
+.color-white-melamine-peen { background-color: #eaeaea; }
+.color-folkstone-grey { background-color: #7a828a; }
+.color-storm-grey { background-color: #4b5259; }
 
-/* Clean Parts Tables */
+.color-kara-blu { background-color: #1c355e; }
+.color-petrol-blue { background-color: #104c64; }
+.color-super-black { background-color: #141414; }
+.color-iceberg-white { background-color: #f7f9fa; }
+
+/* Backing styles */
+.color-white-melamine-back { background-color: #eaeaea; }
+.color-masonite-back { background-color: #a1785c; }
+
+/* Cutting list output tables styling */
+.cutting-list-container { padding: 25px; background-color: #0f172a; border-top: 2px solid #1e293b; }
 .material-group-title {
-    background-color: #2d3748;
-    color: #ffffff;
-    padding: 10px 12px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    margin-top: 25px;
-    border-radius: 4px 4px 0 0;
     display: flex;
     justify-content: space-between;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    font-size: 0.85rem;
-    background: #ffffff;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
-    border-left: 1px solid #e2e8f0;
-    border-right: 1px solid #e2e8f0;
-}
-
-th {
-    background-color: #f7fafc;
-    color: #4a5568;
+    background-color: #1e293b;
+    padding: 10px 15px;
     font-weight: bold;
+    color: #3b82f6;
+    margin-top: 20px;
 }
+table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+th, td { text-align: left; padding: 10px; border-bottom: 1px solid #1e293b; }
+th { background-color: #0f172a; color: #94a3b8; }
+tr:hover { background-color: #1e293b; }
