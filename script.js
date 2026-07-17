@@ -1,4 +1,4 @@
-// Complete Isolated Parameter Architecture
+// Complete Architecture with Focus Persistence and Correct Depth Alignments
 let modules = [
     { 
         id: 1, 
@@ -40,15 +40,7 @@ const handleSizeOptions = `
 
 window.onload = function() {
     setup3DControls();
-    const backSelect = document.getElementById("backMaterial");
-    if (backSelect) {
-        backSelect.innerHTML = `
-            <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
-            <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
-            <option value="Standard Masonite" data-thick="3">Standard Masonite (3mm)</option>
-            <option value="White Masonite" data-thick="3">White Masonite (3mm)</option>
-        `;
-    }
+    initializeGlobalSettings();
     calculateCabinetSetup();
 };
 
@@ -57,7 +49,7 @@ function setup3DControls() {
     const stage = document.getElementById("stage");
     if (!viewport || !stage) return;
 
-    viewport.style.perspective = "1200px";
+    viewport.style.perspective = "1500px";
 
     const startDrag = (x, y) => { isDragging = true; previousMousePosition = { x, y }; };
     const moveDrag = (x, y) => {
@@ -78,8 +70,17 @@ function setup3DControls() {
     window.addEventListener("touchmove", (e) => moveDrag(e.touches[0].clientX, e.touches[0].clientY));
 }
 
-function syncBackingThickness() {
-    calculateCabinetSetup();
+function initializeGlobalSettings() {
+    // Ensuring global configuration options are set up in your selector interface
+    const backSelect = document.getElementById("backMaterial");
+    if (backSelect && backSelect.children.length <= 1) {
+        backSelect.innerHTML = `
+            <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
+            <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
+            <option value="Standard Masonite" data-thick="3">Standard Masonite (3mm)</option>
+            <option value="White Masonite" data-thick="3">White Masonite (3mm)</option>
+        `;
+    }
 }
 
 function addNewModule() {
@@ -90,14 +91,17 @@ function addNewModule() {
         doorStyle: "shaker", doorHandle: "bar-black", doorHandleSize: 160, doorHeight: 2000, alumColor: "silver"
     });
     calculateCabinetSetup();
+    renderModulesControlPanel();
 }
 
 function removeModule(id) {
     modules = modules.filter(m => m.id !== id);
     calculateCabinetSetup();
+    renderModulesControlPanel();
 }
 
-function updateModuleParam(id, param, value) {
+// FIXES THE TYPING GLITCH: This safely updates values without erasing the user's cursor focus
+function updateModuleParamDirect(id, param, value) {
     const mod = modules.find(m => m.id === id);
     if (mod) {
         if (["type", "drawerType", "drawerHandle", "doorStyle", "doorHandle", "alumColor"].includes(param)) {
@@ -105,13 +109,18 @@ function updateModuleParam(id, param, value) {
         } else {
             mod[param] = parseInt(value) || 0;
         }
-        calculateCabinetSetup();
+        calculateCabinetSetup(); // Renders the 3D canvas changes in real-time
     }
 }
 
 function renderModulesControlPanel() {
     const listContainer = document.getElementById("modules-list");
     if (!listContainer) return;
+    
+    // Store which input element currently has active typing focus
+    const activeId = document.activeElement ? document.activeElement.id : null;
+    const activeSelectionStart = document.activeElement ? document.activeElement.selectionStart : null;
+
     listContainer.innerHTML = "";
     
     modules.forEach((mod, index) => {
@@ -119,18 +128,18 @@ function renderModulesControlPanel() {
         card.className = "module-card";
         card.innerHTML = `
             <div class="module-card-header">
-                <span class="module-title">Unit ${index + 1} (Width: ${mod.width || 0}mm)</span>
+                <span class="module-title">Unit ${index + 1}</span>
                 <button class="btn-delete" onclick="removeModule(${mod.id})">Remove</button>
             </div>
             
             <div class="input-grid">
                 <div class="input-group">
                     <label>Width (mm)</label>
-                    <input type="number" value="${mod.width || ''}" placeholder="e.g. 500" oninput="updateModuleParam(${mod.id}, 'width', this.value)">
+                    <input type="number" id="input-w-${mod.id}" value="${mod.width || ''}" placeholder="e.g. 500" oninput="updateModuleParamDirect(${mod.id}, 'width', this.value)">
                 </div>
                 <div class="input-group">
                     <label>Layout Type</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'type', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'type', this.value); renderModulesControlPanel();">
                         <option value="shelves" ${mod.type === 'shelves' ? 'selected' : ''}>Shelving Unit</option>
                         <option value="wardrobe" ${mod.type === 'wardrobe' ? 'selected' : ''}>Hanging Wardrobe</option>
                     </select>
@@ -140,24 +149,24 @@ function renderModulesControlPanel() {
             <div class="input-grid">
                 <div class="input-group">
                     <label>Shelves Count</label>
-                    <input type="number" value="${mod.shelvesCount}" oninput="updateModuleParam(${mod.id}, 'shelvesCount', this.value)">
+                    <input type="number" id="input-s-${mod.id}" value="${mod.shelvesCount}" oninput="updateModuleParamDirect(${mod.id}, 'shelvesCount', this.value)">
                 </div>
                 <div class="input-group">
                     <label>Drawers Count</label>
-                    <input type="number" value="${mod.drawersCount}" oninput="updateModuleParam(${mod.id}, 'drawersCount', this.value)">
+                    <input type="number" id="input-d-${mod.id}" value="${mod.drawersCount}" oninput="updateModuleParamDirect(${mod.id}, 'drawersCount', this.value); renderModulesControlPanel();">
                 </div>
             </div>
 
             <div class="input-grid" ${mod.drawersCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
                     <label>Drawer Handle Style</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'drawerHandle', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'drawerHandle', this.value)">
                         ${handleCatalogOptions}
                     </select>
                 </div>
                 <div class="input-group">
                     <label>Drawer Handle Size</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'drawerHandleSize', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'drawerHandleSize', this.value)">
                         ${handleSizeOptions}
                     </select>
                 </div>
@@ -166,7 +175,7 @@ function renderModulesControlPanel() {
             <div class="input-grid">
                 <div class="input-group">
                     <label>No. of Doors</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'doorsCount', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'doorsCount', this.value); renderModulesControlPanel();">
                         <option value="0" ${mod.doorsCount === 0 ? 'selected' : ''}>No Doors</option>
                         <option value="1" ${mod.doorsCount === 1 ? 'selected' : ''}>Single Door</option>
                         <option value="2" ${mod.doorsCount === 2 ? 'selected' : ''}>Double Doors</option>
@@ -174,14 +183,14 @@ function renderModulesControlPanel() {
                 </div>
                 <div class="input-group" ${mod.doorsCount > 0 ? '' : 'style="display:none;"'}>
                     <label>Custom Door Height (mm)</label>
-                    <input type="number" value="${mod.doorHeight}" oninput="updateModuleParam(${mod.id}, 'doorHeight', this.value)">
+                    <input type="number" id="input-dh-${mod.id}" value="${mod.doorHeight}" oninput="updateModuleParamDirect(${mod.id}, 'doorHeight', this.value)">
                 </div>
             </div>
 
             <div class="input-grid" ${mod.doorsCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
                     <label>Door Facing Profile</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'doorStyle', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'doorStyle', this.value); renderModulesControlPanel();">
                         <option value="shaker" ${mod.doorStyle === 'shaker' ? 'selected' : ''}>Shaker-Style Door</option>
                         <option value="flat" ${mod.doorStyle === 'flat' ? 'selected' : ''}>Standard Flat Face</option>
                         <option value="aluminium-glass" ${mod.doorStyle === 'aluminium-glass' ? 'selected' : ''}>Aluminium Glass Door</option>
@@ -189,7 +198,7 @@ function renderModulesControlPanel() {
                 </div>
                 <div class="input-group" ${mod.doorStyle === 'aluminium-glass' ? '' : 'style="display:none;"'}>
                     <label>Aluminium Frame Color</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'alumColor', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'alumColor', this.value)">
                         <option value="silver" ${mod.alumColor === 'silver' ? 'selected' : ''}>Natural Anodized Silver</option>
                         <option value="black" ${mod.alumColor === 'black' ? 'selected' : ''}>Matt Black</option>
                         <option value="gold" ${mod.alumColor === 'gold' ? 'selected' : ''}>Brushed Gold</option>
@@ -201,13 +210,13 @@ function renderModulesControlPanel() {
             <div class="input-grid" ${mod.doorsCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
                     <label>Door Handle Hardware</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'doorHandle', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'doorHandle', this.value)">
                         ${handleCatalogOptions}
                     </select>
                 </div>
                 <div class="input-group">
                     <label>Door Handle Size</label>
-                    <select onchange="updateModuleParam(${mod.id}, 'doorHandleSize', this.value)">
+                    <select onchange="updateModuleParamDirect(${mod.id}, 'doorHandleSize', this.value)">
                         ${handleSizeOptions}
                     </select>
                 </div>
@@ -225,11 +234,17 @@ function renderModulesControlPanel() {
         }
     });
 
-    document.getElementById("viewport-badge").innerText = `${modules.length} Unit(s) Loaded`;
+    // Reassign focus back cleanly to avoid interruptions while typing widths
+    if (activeId) {
+        const inputEl = document.getElementById(activeId);
+        if (inputEl) {
+            inputEl.focus();
+            if (activeSelectionStart !== null) inputEl.setSelectionRange(activeSelectionStart, activeSelectionStart);
+        }
+    }
 }
 
 function calculateCabinetSetup() {
-    renderModulesControlPanel();
     const stage = document.getElementById("stage");
     if (!stage) return;
     stage.innerHTML = "";
@@ -240,6 +255,10 @@ function calculateCabinetSetup() {
     const totalHeight = getVal("height", 2000), totalDepth = getVal("depth", 600), thk = getVal("thickness", 16);
     const kickHeight = getVal("kickHeight", 100), backThk = getVal("backThickness", 16);
     const carcassMat = getStr("carcassMaterial", "White Melamine Peen"), faceMat = getStr("faceMaterial", "Super Black"), backMat = getStr("backMaterial", "White Melamine Peen");
+    
+    // NEW DYNAMIC CONFIGURATIONS FOR DECORATIVE PLINTH & EXPOSED SIDES
+    const exposedSides = getStr("exposedPanels", "none"); // options: "none", "left", "right", "both"
+    const plinthMaterialType = getStr("plinthMaterial", "matching"); // options: "matching", "silver-alum", "black-alum"
 
     let activeModules = modules.map(m => ({...m, width: m.width || 500}));
     let totalWidth = activeModules.reduce((sum, m) => sum + m.width, 0);
@@ -252,7 +271,6 @@ function calculateCabinetSetup() {
     stage.style.height = `${hScaled}px`;
     stage.style.transformStyle = "preserve-3d";
 
-    // REALISTIC 3D HARDWARE GENERATION ENGINE
     function renderHardwareAsset(parentHTML, styleVal, sizeMm, isVertical = false) {
         if (styleVal === "none") return parentHTML;
         let hardwareHTML = parentHTML;
@@ -266,22 +284,16 @@ function calculateCabinetSetup() {
             if (isVertical) {
                 hardwareHTML += `
                     <div style="position: absolute; right: 25px; top: calc(50% - ${sizeScaled/2}px); width: 8px; height: ${sizeScaled}px; transform-style: preserve-3d; transform: translateZ(1px);">
-                        <!-- Left Standoff Post -->
-                        <div style="position: absolute; top: 10px; left: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateX(90deg); transform-origin: top;"></div>
-                        <!-- Right Standoff Post -->
-                        <div style="position: absolute; bottom: 10px; left: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateX(90deg); transform-origin: top;"></div>
-                        <!-- Main Front Pull Bar Face -->
-                        <div style="position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: ${hexColor}; transform: translateZ(10px); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); border-radius: 2px;"></div>
+                        <div style="position: absolute; top: 6px; left: 2px; width: 4px; height: 12px; background: ${hexColor}; transform: translateZ(12px) rotateX(90deg);"></div>
+                        <div style="position: absolute; bottom: 6px; left: 2px; width: 4px; height: 12px; background: ${hexColor}; transform: translateZ(12px) rotateX(90deg);"></div>
+                        <div style="position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: ${hexColor}; transform: translateZ(12px); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); border-radius: 4px;"></div>
                     </div>`;
             } else {
                 hardwareHTML += `
                     <div style="position: absolute; left: calc(50% - ${sizeScaled/2}px); top: calc(50% - 4px); width: ${sizeScaled}px; height: 8px; transform-style: preserve-3d; transform: translateZ(1px);">
-                        <!-- Top Standoff Post -->
-                        <div style="position: absolute; left: 10px; top: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateY(90deg); transform-origin: left;"></div>
-                        <!-- Bottom Standoff Post -->
-                        <div style="position: absolute; right: 10px; top: 2px; width: 4px; height: 4px; background: ${hexColor}; transform: translateZ(10px) rotateY(90deg); transform-origin: left;"></div>
-                        <!-- Main Front Pull Bar Face -->
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: ${hexColor}; transform: translateZ(10px); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); border-radius: 2px;"></div>
+                        <div style="position: absolute; left: 6px; top: 2px; width: 12px; height: 4px; background: ${hexColor}; transform: translateZ(12px) rotateY(90deg);"></div>
+                        <div style="position: absolute; right: 6px; top: 2px; width: 12px; height: 4px; background: ${hexColor}; transform: translateZ(12px) rotateY(90deg);"></div>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: ${hexColor}; transform: translateZ(12px); box-shadow: 2px 2px 5px rgba(0,0,0,0.4); border-radius: 4px;"></div>
                     </div>`;
             }
         } else if (styleVal === "cup-antique") {
@@ -290,15 +302,14 @@ function calculateCabinetSetup() {
         return hardwareHTML;
     }
 
-    function create3DBlock(x, y, z, w, h, d, colorClass, borderHex = '#cbd5e1', contentHTML = '', isBackPanel = false) {
+    function create3DBlock(x, y, z, w, h, d, colorClass, borderHex = '#cbd5e1', contentHTML = '') {
         const block = document.createElement("div");
         block.className = `panel-3d ${colorClass}`;
         block.style.width = `${w}px`; block.style.height = `${h}px`; block.style.position = "absolute";
         block.style.left = `${x}px`; block.style.top = `${y}px`; block.style.transform = `translate3d(0, 0, ${z}px)`;
         block.style.transformStyle = "preserve-3d";
 
-        // CRITICAL DEPTH SORTING REPAIR: Back panel uses localized flat geometry to prevent rear duplication illusions
-        const faces = isBackPanel ? [{ t: `translate3d(0,0,1px)`, w, h }] : [
+        const faces = [
             { t: `translate3d(0,0,${d}px)`, w, h }, { t: `rotateY(180deg)`, w, h },
             { t: `rotateY(-90deg)`, w: d, h, o: 'left' }, { t: `rotateY(90deg) translate3d(0,0,${w}px)`, w: d, h, o: 'left' },
             { t: `rotateX(90deg)`, w, h: d, o: 'top' }, { t: `rotateX(-90deg) translate3d(0,0,${h}px)`, w, h: d, o: 'top' }
@@ -322,17 +333,35 @@ function calculateCabinetSetup() {
     const faceColorClass = `color-${faceMat.toLowerCase().replace(/ /g, "-")}`;
     const backColorClass = backMat.toLowerCase().includes("masonite") ? 'color-natural-oak' : `color-${backMat.toLowerCase().replace(/ /g, "-")}`;
 
+    // Define Plinth Color Class
+    let plinthColorClass = carcassColorClass;
+    if (plinthMaterialType === "silver-alum") plinthColorClass = "color-folkstone-grey"; // Simulated Anodized Silver
+    if (plinthMaterialType === "black-alum") plinthColorClass = "color-super-black";
+
     const internalHeight = totalHeight - kickHeight - thk;
     
-    // Core Outer Box Layout
-    create3DBlock(thkScaled, (totalHeight - kickHeight - thk) * scale, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
-    create3DBlock(thkScaled, (totalHeight - kickHeight) * scale, thkScaled, wScaled - (thkScaled * 2), kickScaled, thkScaled, carcassColorClass);
+    // BACK PANEL ALIGNMENT ENHANCEMENT: Placed back panel at absolute z=0 relative to frame walls
+    const backThicknessScaled = backThk * scale;
+    create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), internalHeight * scale, backThicknessScaled, backColorClass, '#94a3b8');
+
+    // Structural Base Plates and Top Decks
+    create3DBlock(thkScaled, internalHeight * scale, backThicknessScaled, wScaled - (thkScaled * 2), thkScaled, dScaled - backThicknessScaled, carcassColorClass);
+    create3DBlock(thkScaled, 0, backThicknessScaled, wScaled - (thkScaled * 2), thkScaled, dScaled - backThicknessScaled, carcassColorClass);
+    
+    // Gables/Sides Sitting Flush
     create3DBlock(0, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
     create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
-    create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
-    
-    // LOCKED REAR BOUNDARY MAPPING (Stops all ghosting overlaps out the back profile)
-    create3DBlock(thkScaled, thkScaled, 2, wScaled - (thkScaled * 2), (internalHeight - thk) * scale, 1, backColorClass, '#a3a3a3', '', true);
+
+    // EXPOSED DECORATIVE SIDE PANELS IMPLEMENTATION
+    if (exposedSides === "left" || exposedSides === "both") {
+        create3DBlock(-thkScaled, 0, 0, thkScaled, (internalHeight + thk) * scale, dScaled + 2, faceColorClass, '#111');
+    }
+    if (exposedSides === "right" || exposedSides === "both") {
+        create3DBlock(wScaled, 0, 0, thkScaled, (internalHeight + thk) * scale, dScaled + 2, faceColorClass, '#111');
+    }
+
+    // THE DECORATIVE CONTINUOUS FRONT PLINTH
+    create3DBlock(0, (totalHeight - kickHeight) * scale, dScaled - thkScaled, wScaled, kickScaled, thkScaled, plinthColorClass, '#475569');
 
     let currentX = thk;
     activeModules.forEach((mod, index) => {
@@ -340,14 +369,13 @@ function calculateCabinetSetup() {
         const modLeftScaled = currentX * scale;
 
         if (index < activeModules.length - 1) {
-            create3DBlock((currentX + mod.width - thk) * scale, thkScaled, 0, thkScaled, (internalHeight - thk) * scale, dScaled, carcassColorClass);
+            create3DBlock((currentX + mod.width - thk) * scale, thkScaled, backThicknessScaled, thkScaled, (internalHeight - thk) * scale, dScaled - backThicknessScaled, carcassColorClass);
         }
 
         if (mod.type === "wardrobe") {
             create3DBlock((currentX + 4) * scale, (thk + 60) * scale, (totalDepth / 2) * scale, (mod.width - thk - 8) * scale, 15 * scale, 15 * scale, "color-folkstone-grey", "#666");
         }
 
-        // Drawers Box Block Implementation
         let structuralFloorY = totalHeight - kickHeight - thk;
         if (mod.drawersCount > 0) {
             const drawerUnitHeight = 160;
@@ -364,7 +392,6 @@ function calculateCabinetSetup() {
             }
         }
 
-        // Internal Shelving
         if (mod.shelvesCount > 0) {
             let spaceTop = thk + (mod.type === "wardrobe" ? 300 : 40);
             let spaceBottom = mod.drawersCount > 0 ? (totalHeight - kickHeight - thk - (mod.drawersCount * 160)) : (totalHeight - kickHeight - thk);
@@ -372,11 +399,10 @@ function calculateCabinetSetup() {
             let interval = availableH / (mod.shelvesCount + 1);
 
             for (let s = 1; s <= mod.shelvesCount; s++) {
-                create3DBlock(modLeftScaled, (spaceTop + (interval * s)) * scale, thkScaled, modInnerWScaled, thkScaled, dScaled - thkScaled, carcassColorClass);
+                create3DBlock(modLeftScaled, (spaceTop + (interval * s)) * scale, backThicknessScaled + thkScaled, modInnerWScaled, thkScaled, dScaled - backThicknessScaled - thkScaled, carcassColorClass);
             }
         }
 
-        // Doors Loop with Colors Selection Integration
         if (mod.doorsCount > 0) {
             const doorGap = 2;
             const doorWidth = (mod.doorsCount === 2) ? ((mod.width - thk) / 2) - (doorGap * 1.5) : (mod.width - thk) - (doorGap * 2);
@@ -389,7 +415,7 @@ function calculateCabinetSetup() {
                 if (mod.doorStyle === "shaker") {
                     frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.06); width: 100%; height: 100%; box-sizing: border-box; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12); transform-style: preserve-3d;"></div>`;
                 } else if (mod.doorStyle === "aluminium-glass") {
-                    let frameHex = "#4a5568"; // Default Natural Silver Anodized
+                    let frameHex = "#4a5568";
                     if (mod.alumColor === "black") frameHex = "#1a1a1a";
                     if (mod.alumColor === "gold") frameHex = "#c5a059";
                     if (mod.alumColor === "champagne") frameHex = "#8c7662";
@@ -407,10 +433,10 @@ function calculateCabinetSetup() {
         currentX += mod.width - thk;
     });
 
-    generateCutlist(totalHeight, totalDepth, thk, kickHeight, backThk, carcassMat, faceMat, backMat, activeModules);
+    generateCutlist(totalHeight, totalDepth, thk, kickHeight, backThk, carcassMat, faceMat, backMat, activeModules, exposedSides, plinthMaterialType);
 }
 
-function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeModules) {
+function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeModules, exposedSides, plinthMaterialType) {
     const listOutput = document.getElementById("lists-output");
     if (!listOutput) return; listOutput.innerHTML = "";
     let totalWidth = activeModules.reduce((sum, m) => sum + m.width, 0);
@@ -419,8 +445,7 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
         { name: "End Gable (Left)", qty: 1, len: H - K - T, wid: D, mat: carcassMat },
         { name: "End Gable (Right)", qty: 1, len: H - K - T, wid: D, mat: carcassMat },
         { name: "Top Deck Plate", qty: 1, len: totalWidth - (T * 2), wid: D, mat: carcassMat },
-        { name: "Bottom Base Plate", qty: 1, len: totalWidth - (T * 2), wid: D, mat: carcassMat },
-        { name: "Kickplate", qty: 1, len: totalWidth - (T * 2), wid: K, mat: carcassMat }
+        { name: "Bottom Base Plate", qty: 1, len: totalWidth - (T * 2), wid: D, mat: carcassMat }
     ];
 
     if (activeModules.length > 1) {
@@ -432,6 +457,14 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
             carcassParts.push({ name: `Unit ${idx + 1} Shelves`, qty: mod.shelvesCount, len: mod.width - T, wid: D - 20, mat: carcassMat });
         }
     });
+
+    // ADD EXPOSED SIDE PANELS TO THE CUTTING LIST SPECS
+    if (exposedSides === "left" || exposedSides === "both") {
+        carcassParts.push({ name: "Exposed Decorative Side Panel (Left)", qty: 1, len: H - K, wid: D + 2, mat: faceMat });
+    }
+    if (exposedSides === "right" || exposedSides === "both") {
+        carcassParts.push({ name: "Exposed Decorative Side Panel (Right)", qty: 1, len: H - K, wid: D + 2, mat: faceMat });
+    }
 
     const faceParts = [];
     activeModules.forEach((mod, idx) => {
@@ -445,6 +478,12 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
         }
     });
 
+    // ADD THE DECORATIVE PLINTH TO SPECIFICATIONS
+    let plinthSpecs = carcassMat;
+    if (plinthMaterialType === "silver-alum") plinthSpecs = "Brushed Silver Aluminium Kickplate Profile";
+    if (plinthMaterialType === "black-alum") plinthSpecs = "Matt Black Aluminium Kickplate Profile";
+    faceParts.push({ name: "Decorative Continuous Front Plinth", qty: 1, len: totalWidth, wid: K, mat: plinthSpecs });
+
     const backParts = [{ name: "Backing Board", qty: 1, len: H - K - T - 4, wid: totalWidth - (T * 2) - 4, mat: backMat }];
 
     function renderTable(title, parts) {
@@ -454,6 +493,6 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
     }
 
     listOutput.innerHTML += renderTable("CARCASS COMPONENTS", carcassParts);
-    if (faceParts.length > 0) listOutput.innerHTML += renderTable("FACINGS & DOORS", faceParts);
+    if (faceParts.length > 0) listOutput.innerHTML += renderTable("FACINGS, DOORS & PLINTHS", faceParts);
     listOutput.innerHTML += renderTable("BACKING PANEL COMPONENTS", backParts);
 }
