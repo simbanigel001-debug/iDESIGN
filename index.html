@@ -35,7 +35,6 @@
                 </div>
             </div>
 
-            <!-- Set to 0 if no top track profile is used -->
             <input type="hidden" id="topTrack" value="0">
 
             <h3>Materials (PG Bison Melawood)</h3>
@@ -109,7 +108,6 @@
                 </select>
             </div>
 
-            <!-- Backing selection (Set to Melamine, no Masonite) -->
             <div class="input-grid">
                 <div class="input-group">
                     <label>Backing Material</label>
@@ -125,7 +123,7 @@
                 </div>
             </div>
 
-            <h3>Styling & Hardware</h3>
+            <h3>Styling & Global Hardware</h3>
             <div class="input-grid">
                 <div class="input-group">
                     <label>Door Profile</label>
@@ -135,7 +133,7 @@
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>Handles</label>
+                    <label>Door Handles</label>
                     <select id="handleStyle" onchange="calculateCabinetSetup()">
                         <option value="gola">Continuous Gola Channel</option>
                         <option value="bar-chrome">Modern Chrome Bar</option>
@@ -150,12 +148,10 @@
                 <button class="btn-add" onclick="addNewModule()">+ Add Unit</button>
             </div>
             
-            <div id="modules-list">
-                <!-- Javascript builds individual modules here -->
-            </div>
+            <div id="modules-list"></div>
 
             <div id="modular-warning" style="display: none; color: #ef4444; font-size: 12px; margin-top: 10px; font-weight: bold;">
-                ⚠️ Warning: One of your modules exceeds 1000mm width. Standard fabrication recommends staying below 1000mm to prevent shelf sagging.
+                ⚠️ Warning: One of your modules exceeds 1000mm width.
             </div>
         </div>
 
@@ -165,17 +161,13 @@
                 <span id="viewport-badge" class="badge">0 Unit(s) Loaded</span>
             </div>
 
-            <!-- 3D Viewport Window Container (RESTORED VIEWPORT) -->
             <div id="canvas-viewport">
                 <div id="stage"></div>
             </div>
 
-            <!-- Materials & Cutlist Output Tables -->
             <div class="cutting-list-container">
                 <h2 style="border-bottom: 2px solid #10b981;">Carcass & Door Cutting List (MaxiCut Ready)</h2>
-                <div id="lists-output">
-                    <!-- Javascript generates the tables here -->
-                </div>
+                <div id="lists-output"></div>
             </div>
         </div>
     </div>
