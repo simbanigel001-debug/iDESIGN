@@ -146,8 +146,7 @@ h3 {
 }
 
 /* 3D Visual Stage Container */
-#canvas-viewport {
-    /* 3D Visual Stage Container (Fixes the squishing/collapsing bug) */
+
 #canvas-viewport {
     height: 480px;
     min-height: 480px; /* Forces the viewport to keep its height */
