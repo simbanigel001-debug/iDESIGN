@@ -1,10 +1,20 @@
-/* Base Page Styling */
+:root {
+    --bg-dark: #0f172a;
+    --card-dark: #1e293b;
+    --border-dark: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --danger: #ef4444;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #0f172a;
-    color: #f1f5f9;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
 }
 
 .app-container {
@@ -13,275 +23,232 @@ body {
     overflow: hidden;
 }
 
-/* Sidebar Controls */
+/* Sidebar Styling */
 .sidebar {
     width: 380px;
-    background-color: #1e293b;
-    border-right: 1px solid #334155;
+    background-color: var(--card-dark);
+    border-right: 1px solid var(--border-dark);
     padding: 20px;
     overflow-y: auto;
     box-sizing: border-box;
 }
 
-h2, h3 {
-    margin-top: 0;
-    color: #f8fafc;
+h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 15px 0;
 }
 
-h2 { 
-    border-bottom: 2px solid #3b82f6; 
-    padding-bottom: 10px; 
-    font-size: 1.4rem; 
-}
-
-h3 { 
-    margin-top: 20px; 
-    font-size: 1rem; 
-    color: #94a3b8; 
-    text-transform: uppercase; 
-    letter-spacing: 0.5px; 
+hr {
+    border: 0;
+    border-top: 1px solid var(--border-dark);
+    margin: 20px 0;
 }
 
 .input-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 12px;
     margin-bottom: 12px;
 }
 
 .input-group {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
 }
 
-.input-group label {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-bottom: 4px;
+label {
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
-.input-group input, .input-group select {
-    background-color: #0f172a;
-    border: 1px solid #475569;
-    color: #f1f5f9;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 13px;
-}
-
-/* Module Cards */
-.module-card {
-    background-color: #0f172a;
-    border: 1px solid #334155;
+input, select {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    color: var(--text-main);
+    padding: 8px 12px;
     border-radius: 6px;
-    padding: 12px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+}
+
+.modules-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
+}
+
+/* Modular Unit Control Cards */
+.module-card {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
 }
 
 .module-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #334155;
-    padding-bottom: 6px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 13px;
 }
 
-.module-title { 
-    font-weight: bold; 
-    font-size: 12px; 
-    color: #3b82f6; 
+/* Custom Buttons */
+button {
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background 0.2s;
 }
 
-/* Buttons */
 .btn-add {
-    background-color: #10b981;
+    background: var(--primary);
     color: white;
     border: none;
     padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
+    font-size: 12px;
 }
 
 .btn-delete {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    padding: 3px 8px;
-    border-radius: 4px;
-    cursor: pointer;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 4px 8px;
     font-size: 11px;
 }
 
-.modules-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
 }
 
-/* Main Viewport Areas */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 14px;
+}
+
+.btn-primary:hover, .btn-add:hover {
+    background: var(--primary-hover);
+}
+
+/* Main Arena Layout */
 .main-content {
     flex: 1;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    background-color: #090d16;
+    gap: 20px;
     overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.viewport-card, .list-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 20px;
 }
 
 .viewport-header {
     display: flex;
     justify-content: space-between;
-    padding: 15px 20px;
-    background-color: #0f172a;
-    border-bottom: 1px solid #1e293b;
-}
-
-.badge { 
-    background-color: #3b82f6; 
-    padding: 3px 8px; 
-    border-radius: 12px; 
-    font-size: 11px; 
-    font-weight: bold; 
-}
-
-/* 3D Visual Stage Container */
-
-#canvas-viewport {
-    height: 480px;
-    min-height: 480px; /* Forces the viewport to keep its height */
-    flex-shrink: 0;    /* Prevents the cutting lists from squishing it */
-    display: flex;
     align-items: center;
-    justify-content: center;
-    perspective: 1200px; /* Essential depth context for 3D */
-    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.badge {
+    background: #3b82f6;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* CSS 3D Display Engine Layouts */
+.canvas-viewport {
+    width: 100%;
+    height: 450px;
     background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
-    cursor: grab;
-    user-select: none;
-}
-
-#canvas-viewport:active {
-    cursor: grabbing; 
-}
-
-#stage {
+    border-radius: 8px;
+    overflow: hidden;
     position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.05s ease-out; /* Smooth rotation response */
+    cursor: grab;
 }
 
-/* True CSS 3D Box Rendering */
+.canvas-viewport:active {
+    cursor: grabbing;
+}
+
+.stage {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    margin: auto;
+    transform-style: preserve-3d;
+    transform: rotateX(-15deg) rotateY(-20deg);
+    width: 200px;
+    height: 300px;
+}
+
+/* Essential Clean Panels 3D Engine */
 .panel-3d {
     position: absolute;
     transform-style: preserve-3d;
 }
 
-.panel-3d > div {
-    position: absolute;
-    background-color: inherit;
-    backface-visibility: visible;
+/* Simulation Textures Palette */
+.color-white-melamine-peen { background-color: #f3f4f6; color: #1e293b; }
+.color-folkstone-grey { background-color: #cbd5e1; }
+.color-super-black { background-color: #111827; }
+.color-iceberg-white { background-color: #ffffff; }
+.color-natural-oak { background-color: #b45309; }
+
+.helper-text {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 10px;
 }
 
-/* Material Colors mapping to selectors */
-.color-white-melamine-peen { background-color: #eaeaea; }
-.color-iceberg-white { background-color: #f4f6f8; }
-.color-folkstone-grey { background-color: #7a828a; }
-.color-storm-grey { background-color: #4b5259; }
-.color-super-black { background-color: #1a1a1a; }
-.color-dunblane-grey { background-color: #afb4b9; }
+/* Output Data Layouts Matrix */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
 
-.color-kara-blu { background-color: #1e2e47; }
-.color-petrol-blue { background-color: #154556; }
-.color-cappuccino { background-color: #9c8e82; }
-.color-congo { background-color: #473a33; }
+th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-dark);
+}
 
-/* Woodgrains Colors representation */
-.color-coimbra { background-color: #ded1be; }
-.color-esperanza-oak { background-color: #c0b094; }
-.color-lanza-oak { background-color: #a49176; }
-.color-monument-oak { background-color: #5d5449; }
-.color-verzasca-oak { background-color: #7b6d5b; }
-.color-arden { background-color: #d2c5b4; }
-.color-vardo { background-color: #8c7f6f; }
-.color-camden { background-color: #bfae9a; }
-.color-greythorne { background-color: #929591; }
-.color-brookhill { background-color: #715b49; }
-.color-american-walnut { background-color: #553b28; }
-.color-natural-oak { background-color: #d1b183; }
-.color-windsor-cherry { background-color: #74251e; }
-
-/* Cutting list output tables styling */
-.cutting-list-container { 
-    padding: 25px; 
-    background-color: #0f172a; 
-    border-top: 2px solid #1e293b; 
+th {
+    background-color: var(--bg-dark);
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
 .material-group-title {
+    background: var(--bg-dark);
+    padding: 10px;
+    border-left: 4px solid var(--primary);
+    font-weight: bold;
     display: flex;
     justify-content: space-between;
-    background-color: #1e293b;
-    padding: 10px 15px;
-    font-weight: bold;
-    color: #3b82f6;
-    margin-top: 20px;
 }
-
-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    margin-bottom: 20px; 
-    font-size: 13px; 
-}
-
-th, td { 
-    text-align: left; 
-    padding: 10px; 
-    border-bottom: 1px solid #1e293b; 
-}
-
-th { 
-    background-color: #0f172a; 
-    color: #94a3b8; 
-}
-
-tr:hover { 
-    background-color: #1e293b; 
-}
-/* 3D Panel Surface Basics */
-.panel-3d div {
-    background-size: cover;
-    background-position: center;
-}
-
-/* --- PG Bison Melawood High-Contrast Woodgrain Textures --- */
-.color-coimbra div, .color-natural-oak div {
-    background-color: #e5c298;
-    background-image: repeating-linear-gradient(90deg, rgba(139,105,74,0.15) 0px, rgba(139,105,74,0.15) 4px, transparent 4px, transparent 20px),
-                      repeating-linear-gradient(85deg, rgba(100,70,40,0.1) 0px, rgba(100,70,40,0.1) 10px, transparent 10px, transparent 30px);
-}
-
-.color-esperanza-oak div, .color-lanza-oak div, .color-brookhill div {
-    background-color: #bc9468;
-    background-image: repeating-linear-gradient(90deg, rgba(80,50,20,0.2) 0px, rgba(80,50,20,0.2) 6px, transparent 6px, transparent 24px),
-                      repeating-linear-gradient(88deg, rgba(60,35,15,0.15) 0px, rgba(60,35,15,0.15) 12px, transparent 12px, transparent 40px);
-}
-
-.color-monument-oak div, .color-verzasca-oak div, .color-greythorne div {
-    background-color: #6b5947;
-    background-image: repeating-linear-gradient(90deg, rgba(45,35,25,0.3) 0px, rgba(45,35,25,0.3) 5px, transparent 5px, transparent 15px);
-}
-
-.color-american-walnut div, .color-vardo div {
-    background-color: #4a3319;
-    background-image: repeating-linear-gradient(90deg, rgba(20,10,0,0.4) 0px, rgba(20,10,0,0.4) 8px, transparent 8px, transparent 35px),
-                      repeating-linear-gradient(93deg, rgba(35,18,5,0.3) 0px, rgba(35,18,5,0.3) 15px, transparent 15px, transparent 50px);
-}
-
-/* Solid Colors */
-.color-white-melamine-peen div { background-color: #f8fafc; }
-.color-iceberg-white div { background-color: #ffffff; }
-.color-folkstone-grey div { background-color: #cbd5e1; }
-.color-storm-grey div { background-color: #64748b; }
-.color-super-black div { background-color: #0f172a; }
