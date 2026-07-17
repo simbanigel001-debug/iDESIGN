@@ -1,4 +1,4 @@
-// Complete Decoupled Configuration Architecture
+// Complete Isolated Parameter Architecture
 let modules = [
     { 
         id: 1, 
@@ -19,24 +19,18 @@ let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
 let rotation = { x: -15, y: -20 };
 
-// Extended Architectural Handle Library Blueprint
 const handleCatalogOptions = `
     <option value="none">Tip-On / Push-to-Open</option>
     <option value="gola">Continuous Gola Integrated Profile</option>
-    <optgroup label="T-Bar & Pull Handles">
-        <option value="bar-black">Matte Black Architectural T-Bar (160mm)</option>
-        <option value="bar-chrome">Polished Chrome T-Bar Pull (160mm)</option>
-        <option value="bar-brushed">Brushed Brass Luxury T-Bar (192mm)</option>
-        <option value="cup-antique">Antique Pewter Bin Cup Pull</option>
+    <optgroup label="T-Bar & Pull Hardware">
+        <option value="bar-black">Matte Black T-Bar (160mm)</option>
+        <option value="bar-chrome">Polished Chrome T-Bar (160mm)</option>
+        <option value="bar-brushed">Brushed Brass T-Bar (192mm)</option>
+        <option value="cup-antique">Antique Bin Cup Pull</option>
     </optgroup>
-    <optgroup label="Minimalist & Edge Profiles">
-        <option value="edge-lip-black">Slimline Matte Black Lip Profile</option>
+    <optgroup label="Minimalist Profiles">
+        <option value="edge-lip-black">Slimline Black Lip Profile</option>
         <option value="edge-lip-silver">Anodized Aluminium Edge Pull</option>
-        <option value="finger-j">Integrated J-Pull Finger Groove</option>
-    </optgroup>
-    <optgroup label="Knobs & Accent Hardware">
-        <option value="knob-round-black">Minimalist Matte Black Matte Knob</option>
-        <option value="knob-brushed-gold">Industrial Knurled Brass Knob</option>
     </optgroup>
 `;
 
@@ -144,7 +138,6 @@ function renderModulesControlPanel() {
                 </div>
             </div>
 
-            <!-- Decentralized Independent Drawer Control Face Box -->
             <div class="input-grid" ${mod.drawersCount > 0 ? '' : 'style="display:none;"'}>
                 <div class="input-group">
                     <label>Drawer Box Layout</label>
@@ -161,7 +154,6 @@ function renderModulesControlPanel() {
                 </div>
             </div>
 
-            <!-- Decentralized Independent Door & Profiles Setup Box -->
             <div class="input-grid">
                 <div class="input-group">
                     <label>No. of Doors</label>
@@ -196,17 +188,11 @@ function renderModulesControlPanel() {
         `;
         listContainer.appendChild(card);
 
-        // Retain individual dropdown values across instant operational re-renders
-        if (mod.drawersCount > 0) {
-            card.querySelector(`[onchange*="drawerHandle"]`).value = mod.drawerHandle;
-        }
-        if (mod.doorsCount > 0) {
-            card.querySelector(`[onchange*="doorHandle"]`).value = mod.doorHandle;
-        }
+        if (mod.drawersCount > 0) card.querySelector(`[onchange*="drawerHandle"]`).value = mod.drawerHandle;
+        if (mod.doorsCount > 0) card.querySelector(`[onchange*="doorHandle"]`).value = mod.doorHandle;
     });
 
     document.getElementById("viewport-badge").innerText = `${modules.length} Unit(s) Loaded`;
-    document.getElementById("modular-warning").style.display = modules.some(m => m.width > 1000) ? "block" : "none";
 }
 
 function calculateCabinetSetup() {
@@ -231,7 +217,6 @@ function calculateCabinetSetup() {
 
     stage.style.width = `${wScaled}px`;
     stage.style.height = `${hScaled}px`;
-    stage.style.transform = `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`;
 
     function renderHardwareAsset(parentHTML, styleVal, isVertical = false) {
         let hardwareHTML = parentHTML;
@@ -241,18 +226,12 @@ function calculateCabinetSetup() {
 
         if (styleVal.startsWith("bar-")) {
             hardwareHTML += isVertical 
-                ? `<div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 8px; height: 140px; background: ${color}; border-radius: 2px; box-shadow: 1px 1px 4px rgba(0,0,0,0.4);"></div>`
-                : `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120px; height: 8px; background: ${color}; border-radius: 2px; box-shadow: 1px 1px 4px rgba(0,0,0,0.4);"></div>`;
+                ? `<div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 8px; height: 140px; background: ${color}; border-radius: 2px;"></div>`
+                : `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120px; height: 8px; background: ${color}; border-radius: 2px;"></div>`;
         } else if (styleVal.startsWith("knob-")) {
-            hardwareHTML += isVertical
-                ? `<div style="position: absolute; right: 20px; top: 50%; width: 14px; height: 14px; background: ${color}; border-radius: 50%; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);"></div>`
-                : `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: ${color}; border-radius: 50%; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);"></div>`;
+            hardwareHTML += `<div style="position: absolute; ${isVertical ? 'right: 20px; top: 50%;' : 'left: 50%; top: 50%; transform: translate(-50%, -50%);'} width: 14px; height: 14px; background: ${color}; border-radius: 50%;"></div>`;
         } else if (styleVal === "cup-antique") {
-            hardwareHTML += `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 40px; height: 20px; background: #4a4a4a; border-radius: 20px 20px 0 0; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);"></div>`;
-        } else if (styleVal.startsWith("edge-lip-")) {
-            hardwareHTML += isVertical
-                ? `<div style="position: absolute; right: 0; top: 20%; width: 4px; height: 200px; background: ${color};"></div>`
-                : `<div style="position: absolute; left: 0; top: 0; width: 100%; height: 4px; background: ${color};"></div>`;
+            hardwareHTML += `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 40px; height: 20px; background: #4a4a4a; border-radius: 20px 20px 0 0;"></div>`;
         }
         return hardwareHTML;
     }
@@ -285,28 +264,36 @@ function calculateCabinetSetup() {
     const faceColorClass = `color-${faceMat.toLowerCase().replace(/ /g, "-")}`;
     const backColorClass = `color-${backMat.toLowerCase().replace(/ /g, "-")}`;
 
-    // Main Housing Base Assemblies
+    // --- ACCURATE COMPONENT DIMENSION MAPPING (No Overlaps) ---
     const internalHeight = totalHeight - kickHeight - thk;
-    create3DBlock(thkScaled, (totalHeight - kickHeight) * scale, (thk + 10) * scale, wScaled - (thkScaled * 2), kickScaled, (totalDepth - thk - 10) * scale, carcassColorClass);
-    create3DBlock(0, 0, 0, thkScaled, (internalHeight) * scale, dScaled, carcassColorClass);
-    create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, (internalHeight) * scale, dScaled, carcassColorClass);
-    create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
+    
+    // Bottom Base Plate (Sits strictly between the left and right end gables)
     create3DBlock(thkScaled, (totalHeight - kickHeight - thk) * scale, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
-    create3DBlock(thkScaled + 1, thkScaled + 1, 1, wScaled - (thkScaled * 2) - 2, (internalHeight - thk - 2) * scale, backThkScaled, backColorClass);
+    // Kickplate (Recessed or aligned under base floor)
+    create3DBlock(thkScaled, (totalHeight - kickHeight) * scale, thkScaled, wScaled - (thkScaled * 2), kickScaled, thkScaled, carcassColorClass);
+    // Left & Right Gables
+    create3DBlock(0, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
+    create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
+    // Top Deck Plate (Spans between gables)
+    create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
+    // Backing (Recessed inside side gables)
+    create3DBlock(thkScaled, thkScaled, backThkScaled, wScaled - (thkScaled * 2), (internalHeight - thk) * scale, backThkScaled, backColorClass);
 
     let currentX = thk;
     activeModules.forEach((mod, index) => {
-        const modWScaled = mod.width * scale, modLeftScaled = currentX * scale, modInnerWScaled = (mod.width - thk) * scale;
+        const modInnerWScaled = (mod.width - thk) * scale;
+        const modLeftScaled = currentX * scale;
 
+        // Shared Internal Divider panels
         if (index < activeModules.length - 1) {
-            create3DBlock((currentX + mod.width - thk) * scale, thkScaled, 0, thkScaled, (internalHeight - (thk * 2)) * scale, dScaled, carcassColorClass);
+            create3DBlock((currentX + mod.width - thk) * scale, thkScaled, 0, thkScaled, (internalHeight - thk) * scale, dScaled, carcassColorClass);
         }
 
         if (mod.type === "wardrobe") {
             create3DBlock((currentX + 4) * scale, (thk + 60) * scale, (totalDepth / 2) * scale, (mod.width - thk - 8) * scale, 15 * scale, 15 * scale, "color-folkstone-grey", "#666");
         }
 
-        // Render Drawer Configuration Groupings
+        // Isolated Drawer Rendering (Drawers NEVER inherit Aluminum styles)
         let structuralFloorY = totalHeight - kickHeight - thk;
         if (mod.drawersCount > 0) {
             const drawerUnitHeight = 160;
@@ -315,18 +302,14 @@ function calculateCabinetSetup() {
                 
                 if (mod.drawerType === "external") {
                     let frontHTML = '';
+                    // Force drawer to remain solid woodgrain / lacquer styling even if door above is aluminum glass
                     if (mod.doorStyle === "shaker") {
-                        frontHTML = `<div style="border: 4px solid rgba(0,0,0,0.15); width: 100%; height: 100%; box-sizing: border-box;"></div>`;
-                    } else if (mod.doorStyle === "aluminium-glass") {
-                        frontHTML = `<div style="border: 5px solid #555; width: 100%; height: 100%; box-sizing: border-box; background: rgba(173,216,230,0.35); backdrop-filter: blur(1px);"></div>`;
+                        frontHTML = `<div style="border: 4px solid rgba(0,0,0,0.12); width: 100%; height: 100%; box-sizing: border-box;"></div>`;
+                    } else {
+                        frontHTML = `<div style="border: 1px solid rgba(0,0,0,0.05); width: 100%; height: 100%; box-sizing: border-box;"></div>`;
                     }
                     
                     frontHTML = renderHardwareAsset(frontHTML, mod.drawerHandle, false);
-
-                    if (mod.drawerHandle === "gola") {
-                        create3DBlock(modLeftScaled, (curDrawerY - 20) * scale, (totalDepth - 25) * scale, modInnerWScaled, 20 * scale, 20 * scale, "color-folkstone-grey");
-                    }
-
                     create3DBlock((currentX + 2) * scale, curDrawerY * scale, dScaled + 1, (mod.width - thk - 4) * scale, (drawerUnitHeight - 4) * scale, thkScaled, faceColorClass, '#111', frontHTML);
                 } else {
                     create3DBlock((currentX + 15) * scale, (curDrawerY + 20) * scale, (thk * 2) * scale, (mod.width - thk - 30) * scale, 100 * scale, (totalDepth - thk - 50) * scale, "color-folkstone-grey");
@@ -334,7 +317,7 @@ function calculateCabinetSetup() {
             }
         }
 
-        // Render Internal Shelf Modules
+        // Shelves
         if (mod.shelvesCount > 0) {
             let spaceTop = thk + (mod.type === "wardrobe" ? 300 : 40);
             let spaceBottom = mod.drawersCount > 0 ? (totalHeight - kickHeight - thk - (mod.drawersCount * 160)) : (totalHeight - kickHeight - thk);
@@ -346,7 +329,7 @@ function calculateCabinetSetup() {
             }
         }
 
-        // Render Door Profiles with Selected Facing Styles & Hardware
+        // Doors
         if (mod.doorsCount > 0) {
             const doorGap = 2;
             const doorWidth = (mod.doorsCount === 2) ? ((mod.width - thk) / 2) - (doorGap * 1.5) : (mod.width - thk) - (doorGap * 2);
@@ -359,13 +342,11 @@ function calculateCabinetSetup() {
                 if (mod.doorStyle === "shaker") {
                     frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.06); width: 100%; height: 100%; box-sizing: border-box; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12);"></div>`;
                 } else if (mod.doorStyle === "aluminium-glass") {
-                    // Precision rendering configuration of professional profile frame with transparent glazing field
-                    frontHTML = `<div style="border: 14px solid #4a5568; width: 100%; height: 100%; box-sizing: border-box; background: rgba(150, 200, 220, 0.3); box-shadow: inset 0 0 12px rgba(255,255,255,0.2); border-radius: 1px;"></div>`;
+                    frontHTML = `<div style="border: 14px solid #4a5568; width: 100%; height: 100%; box-sizing: border-box; background: rgba(150, 200, 220, 0.25); backdrop-filter: blur(0.5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.1);"></div>`;
                 }
 
                 frontHTML = renderHardwareAsset(frontHTML, mod.doorHandle, true);
-
-                create3DBlock(doorX * scale, spaceTop * scale, dScaled + 1, doorWidth * scale, (mod.doorHeight) * scale, thkScaled, faceColorClass, '#111', frontHTML);
+                create3DBlock(doorX * scale, spaceTop * scale, dScaled + 2, doorWidth * scale, mod.doorHeight * scale, thkScaled, (mod.doorStyle === "aluminium-glass" ? "color-iceberg-white" : faceColorClass), '#111', frontHTML);
             }
         }
 
@@ -402,8 +383,8 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
     activeModules.forEach((mod, idx) => {
         if (mod.doorsCount > 0) {
             const doorW = (mod.doorsCount === 2) ? ((mod.width - T) / 2) - 4 : (mod.width - T) - 4;
-            const styleLabel = mod.doorStyle === "aluminium-glass" ? "Aluminium Glass Frame" : "Melawood Front";
-            faceParts.push({ name: `Unit ${idx + 1} Door Facings (${styleLabel})`, qty: mod.doorsCount, len: mod.doorHeight, wid: doorW, mat: mod.doorStyle === "aluminium-glass" ? "Aluminium & Clear Glass Profile" : faceMat });
+            const styleLabel = mod.doorStyle === "aluminium-glass" ? "Aluminium Glass Frame" : "Standard Face";
+            faceParts.push({ name: `Unit ${idx + 1} Door Facings (${styleLabel})`, qty: mod.doorsCount, len: mod.doorHeight, wid: doorW, mat: mod.doorStyle === "aluminium-glass" ? "Aluminium Frame Profiles" : faceMat });
         }
         if (mod.drawersCount > 0 && mod.drawerType === "external") {
             faceParts.push({ name: `Unit ${idx + 1} Drawer Fronts`, qty: mod.drawersCount, len: 156, wid: mod.width - T - 4, mat: faceMat });
@@ -412,6 +393,7 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
 
     const backParts = [{ name: "Backing Board", qty: 1, len: H - K - T - 4, wid: totalWidth - (T * 2) - 4, mat: backMat }];
 
+    // Render logic remains identical
     function renderTable(title, parts) {
         let html = `<div class="material-group-title"><span>${title}</span><span>Dimensions in mm</span></div><table><thead><tr><th>Part Description</th><th>Qty</th><th>Length (mm)</th><th>Width (mm)</th><th>Material Specs</th></tr></thead><tbody>`;
         parts.forEach(p => { html += `<tr><td><strong>${p.name}</strong></td><td>${p.qty}</td><td>${p.len}</td><td>${p.wid}</td><td>${p.mat}</td></tr>`; });
