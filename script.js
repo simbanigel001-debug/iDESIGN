@@ -36,6 +36,17 @@ const handleCatalogOptions = `
 
 window.onload = function() {
     setup3DControls();
+    // Injects Masonite directly back into your HTML sidebar dropdown dynamically
+    const backSelect = document.getElementById("backMaterial");
+    if (backSelect) {
+        backSelect.innerHTML = `
+            <option value="White Melamine Peen" data-thick="16" selected>White Melamine (16mm)</option>
+            <option value="Iceberg White" data-thick="9">Iceberg White Melamine (9mm)</option>
+            <option value="Folkstone Grey" data-thick="9">Folkstone Grey Melamine (9mm)</option>
+            <option value="Standard Masonite" data-thick="3">Standard Masonite (3mm)</option>
+            <option value="White Masonite" data-thick="3">White Masonite (3mm)</option>
+        `;
+    }
     calculateCabinetSetup();
 };
 
@@ -226,12 +237,16 @@ function calculateCabinetSetup() {
 
         if (styleVal.startsWith("bar-")) {
             hardwareHTML += isVertical 
-                ? `<div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 8px; height: 140px; background: ${color}; border-radius: 2px;"></div>`
-                : `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120px; height: 8px; background: ${color}; border-radius: 2px;"></div>`;
+                ? `<div style="position: absolute; right: 20px; top: calc(50% - 70px); width: 8px; height: 140px; background: ${color}; border-radius: 2px; transform: translateZ(2px); box-shadow: 1px 1px 3px rgba(0,0,0,0.3);"></div>`
+                : `<div style="position: absolute; left: calc(50% - 60px); top: calc(50% - 4px); width: 120px; height: 8px; background: ${color}; border-radius: 2px; transform: translateZ(2px); box-shadow: 1px 1px 3px rgba(0,0,0,0.3);"></div>`;
         } else if (styleVal.startsWith("knob-")) {
-            hardwareHTML += `<div style="position: absolute; ${isVertical ? 'right: 20px; top: 50%;' : 'left: 50%; top: 50%; transform: translate(-50%, -50%);'} width: 14px; height: 14px; background: ${color}; border-radius: 50%;"></div>`;
+            hardwareHTML += `<div style="position: absolute; ${isVertical ? 'right: 20px; top: calc(50% - 7px);' : 'left: calc(50% - 7px); top: calc(50% - 7px);'} width: 14px; height: 14px; background: ${color}; border-radius: 50%; transform: translateZ(2px); box-shadow: 1px 1px 2px rgba(0,0,0,0.4);"></div>`;
         } else if (styleVal === "cup-antique") {
-            hardwareHTML += `<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 40px; height: 20px; background: #4a4a4a; border-radius: 20px 20px 0 0;"></div>`;
+            hardwareHTML += `<div style="position: absolute; left: calc(50% - 20px); top: calc(50% - 10px); width: 40px; height: 20px; background: #4a4a4a; border-radius: 20px 20px 0 0; transform: translateZ(2px); box-shadow: 1px 1px 2px rgba(0,0,0,0.4);"></div>`;
+        } else if (styleVal.startsWith("edge-lip-")) {
+            hardwareHTML += isVertical
+                ? `<div style="position: absolute; right: 0; top: 20%; width: 4px; height: 160px; background: ${color}; transform: translateZ(1px);"></div>`
+                : `<div style="position: absolute; left: 0; top: 0; width: 100%; height: 4px; background: ${color}; transform: translateZ(1px);"></div>`;
         }
         return hardwareHTML;
     }
@@ -254,37 +269,38 @@ function calculateCabinetSetup() {
             side.style.position = "absolute"; side.style.width = `${f.w}px`; side.style.height = `${f.h}px`; side.style.transform = f.t;
             if (f.o) side.style.transformOrigin = f.o;
             side.style.border = `1px solid ${borderHex}`; side.style.boxSizing = "border-box"; side.style.backgroundColor = "inherit";
-            if (idx === 0 && contentHTML) side.innerHTML = contentHTML;
+            if (idx === 0 && contentHTML) {
+                side.innerHTML = contentHTML;
+                side.style.transformStyle = "preserve-3d"; 
+            }
             block.appendChild(side);
         });
         stage.appendChild(block);
     }
 
+    // Colors mapping setup
+    const isMasonite = backMat.toLowerCase().includes("masonite");
     const carcassColorClass = `color-${carcassMat.toLowerCase().replace(/ /g, "-")}`;
     const faceColorClass = `color-${faceMat.toLowerCase().replace(/ /g, "-")}`;
-    const backColorClass = `color-${backMat.toLowerCase().replace(/ /g, "-")}`;
+    const backColorClass = isMasonite ? 'color-esperanza-oak' : `color-${backMat.toLowerCase().replace(/ /g, "-")}`;
 
-    // --- ACCURATE COMPONENT DIMENSION MAPPING (No Overlaps) ---
     const internalHeight = totalHeight - kickHeight - thk;
     
-    // Bottom Base Plate (Sits strictly between the left and right end gables)
+    // Core Frame Construction - Cleaned up to sit completely flush
     create3DBlock(thkScaled, (totalHeight - kickHeight - thk) * scale, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
-    // Kickplate (Recessed or aligned under base floor)
     create3DBlock(thkScaled, (totalHeight - kickHeight) * scale, thkScaled, wScaled - (thkScaled * 2), kickScaled, thkScaled, carcassColorClass);
-    // Left & Right Gables
     create3DBlock(0, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
     create3DBlock(wScaled - thkScaled, 0, 0, thkScaled, internalHeight * scale, dScaled, carcassColorClass);
-    // Top Deck Plate (Spans between gables)
     create3DBlock(thkScaled, 0, 0, wScaled - (thkScaled * 2), thkScaled, dScaled, carcassColorClass);
-    // Backing (Recessed inside side gables)
-    create3DBlock(thkScaled, thkScaled, backThkScaled, wScaled - (thkScaled * 2), (internalHeight - thk) * scale, backThkScaled, backColorClass);
+    
+    // BACK PANEL FIX: Snaps flush inside the rear alignment grid (Z = 0) with no extra depth projection
+    create3DBlock(thkScaled, thkScaled, 0, wScaled - (thkScaled * 2), (internalHeight - thk) * scale, backThkScaled, backColorClass);
 
     let currentX = thk;
     activeModules.forEach((mod, index) => {
         const modInnerWScaled = (mod.width - thk) * scale;
         const modLeftScaled = currentX * scale;
 
-        // Shared Internal Divider panels
         if (index < activeModules.length - 1) {
             create3DBlock((currentX + mod.width - thk) * scale, thkScaled, 0, thkScaled, (internalHeight - thk) * scale, dScaled, carcassColorClass);
         }
@@ -293,7 +309,7 @@ function calculateCabinetSetup() {
             create3DBlock((currentX + 4) * scale, (thk + 60) * scale, (totalDepth / 2) * scale, (mod.width - thk - 8) * scale, 15 * scale, 15 * scale, "color-folkstone-grey", "#666");
         }
 
-        // Isolated Drawer Rendering (Drawers NEVER inherit Aluminum styles)
+        // Isolated Drawer Rendering loop
         let structuralFloorY = totalHeight - kickHeight - thk;
         if (mod.drawersCount > 0) {
             const drawerUnitHeight = 160;
@@ -302,15 +318,14 @@ function calculateCabinetSetup() {
                 
                 if (mod.drawerType === "external") {
                     let frontHTML = '';
-                    // Force drawer to remain solid woodgrain / lacquer styling even if door above is aluminum glass
                     if (mod.doorStyle === "shaker") {
-                        frontHTML = `<div style="border: 4px solid rgba(0,0,0,0.12); width: 100%; height: 100%; box-sizing: border-box;"></div>`;
+                        frontHTML = `<div style="border: 4px solid rgba(0,0,0,0.12); width: 100%; height: 100%; box-sizing: border-box; transformStyle: preserve-3d;"></div>`;
                     } else {
-                        frontHTML = `<div style="border: 1px solid rgba(0,0,0,0.05); width: 100%; height: 100%; box-sizing: border-box;"></div>`;
+                        frontHTML = `<div style="border: 1px solid rgba(0,0,0,0.05); width: 100%; height: 100%; box-sizing: border-box; transformStyle: preserve-3d;"></div>`;
                     }
                     
                     frontHTML = renderHardwareAsset(frontHTML, mod.drawerHandle, false);
-                    create3DBlock((currentX + 2) * scale, curDrawerY * scale, dScaled + 1, (mod.width - thk - 4) * scale, (drawerUnitHeight - 4) * scale, thkScaled, faceColorClass, '#111', frontHTML);
+                    create3DBlock((currentX + 2) * scale, curDrawerY * scale, dScaled, (mod.width - thk - 4) * scale, (drawerUnitHeight - 4) * scale, thkScaled, faceColorClass, '#111', frontHTML);
                 } else {
                     create3DBlock((currentX + 15) * scale, (curDrawerY + 20) * scale, (thk * 2) * scale, (mod.width - thk - 30) * scale, 100 * scale, (totalDepth - thk - 50) * scale, "color-folkstone-grey");
                 }
@@ -329,7 +344,7 @@ function calculateCabinetSetup() {
             }
         }
 
-        // Doors
+        // Doors Loop
         if (mod.doorsCount > 0) {
             const doorGap = 2;
             const doorWidth = (mod.doorsCount === 2) ? ((mod.width - thk) / 2) - (doorGap * 1.5) : (mod.width - thk) - (doorGap * 2);
@@ -340,13 +355,15 @@ function calculateCabinetSetup() {
                 let frontHTML = '';
 
                 if (mod.doorStyle === "shaker") {
-                    frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.06); width: 100%; height: 100%; box-sizing: border-box; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12);"></div>`;
+                    frontHTML = `<div style="border: 12px solid rgba(0,0,0,0.06); width: 100%; height: 100%; box-sizing: border-box; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12); transformStyle: preserve-3d;"></div>`;
                 } else if (mod.doorStyle === "aluminium-glass") {
-                    frontHTML = `<div style="border: 14px solid #4a5568; width: 100%; height: 100%; box-sizing: border-box; background: rgba(150, 200, 220, 0.25); backdrop-filter: blur(0.5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.1);"></div>`;
+                    frontHTML = `<div style="border: 14px solid #4a5568; width: 100%; height: 100%; box-sizing: border-box; background: rgba(150, 200, 220, 0.25); backdrop-filter: blur(0.5px); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); transformStyle: preserve-3d;"></div>`;
+                } else {
+                    frontHTML = `<div style="width: 100%; height: 100%; transformStyle: preserve-3d;"></div>`;
                 }
 
                 frontHTML = renderHardwareAsset(frontHTML, mod.doorHandle, true);
-                create3DBlock(doorX * scale, spaceTop * scale, dScaled + 2, doorWidth * scale, mod.doorHeight * scale, thkScaled, (mod.doorStyle === "aluminium-glass" ? "color-iceberg-white" : faceColorClass), '#111', frontHTML);
+                create3DBlock(doorX * scale, spaceTop * scale, dScaled + 1, doorWidth * scale, mod.doorHeight * scale, thkScaled, (mod.doorStyle === "aluminium-glass" ? "color-iceberg-white" : faceColorClass), '#111', frontHTML);
             }
         }
 
@@ -393,7 +410,6 @@ function generateCutlist(H, D, T, K, BT, carcassMat, faceMat, backMat, activeMod
 
     const backParts = [{ name: "Backing Board", qty: 1, len: H - K - T - 4, wid: totalWidth - (T * 2) - 4, mat: backMat }];
 
-    // Render logic remains identical
     function renderTable(title, parts) {
         let html = `<div class="material-group-title"><span>${title}</span><span>Dimensions in mm</span></div><table><thead><tr><th>Part Description</th><th>Qty</th><th>Length (mm)</th><th>Width (mm)</th><th>Material Specs</th></tr></thead><tbody>`;
         parts.forEach(p => { html += `<tr><td><strong>${p.name}</strong></td><td>${p.qty}</td><td>${p.len}</td><td>${p.wid}</td><td>${p.mat}</td></tr>`; });
