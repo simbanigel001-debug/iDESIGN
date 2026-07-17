@@ -249,3 +249,39 @@ th {
 tr:hover { 
     background-color: #1e293b; 
 }
+/* 3D Panel Surface Basics */
+.panel-3d div {
+    background-size: cover;
+    background-position: center;
+}
+
+/* --- PG Bison Melawood High-Contrast Woodgrain Textures --- */
+.color-coimbra div, .color-natural-oak div {
+    background-color: #e5c298;
+    background-image: repeating-linear-gradient(90deg, rgba(139,105,74,0.15) 0px, rgba(139,105,74,0.15) 4px, transparent 4px, transparent 20px),
+                      repeating-linear-gradient(85deg, rgba(100,70,40,0.1) 0px, rgba(100,70,40,0.1) 10px, transparent 10px, transparent 30px);
+}
+
+.color-esperanza-oak div, .color-lanza-oak div, .color-brookhill div {
+    background-color: #bc9468;
+    background-image: repeating-linear-gradient(90deg, rgba(80,50,20,0.2) 0px, rgba(80,50,20,0.2) 6px, transparent 6px, transparent 24px),
+                      repeating-linear-gradient(88deg, rgba(60,35,15,0.15) 0px, rgba(60,35,15,0.15) 12px, transparent 12px, transparent 40px);
+}
+
+.color-monument-oak div, .color-verzasca-oak div, .color-greythorne div {
+    background-color: #6b5947;
+    background-image: repeating-linear-gradient(90deg, rgba(45,35,25,0.3) 0px, rgba(45,35,25,0.3) 5px, transparent 5px, transparent 15px);
+}
+
+.color-american-walnut div, .color-vardo div {
+    background-color: #4a3319;
+    background-image: repeating-linear-gradient(90deg, rgba(20,10,0,0.4) 0px, rgba(20,10,0,0.4) 8px, transparent 8px, transparent 35px),
+                      repeating-linear-gradient(93deg, rgba(35,18,5,0.3) 0px, rgba(35,18,5,0.3) 15px, transparent 15px, transparent 50px);
+}
+
+/* Solid Colors */
+.color-white-melamine-peen div { background-color: #f8fafc; }
+.color-iceberg-white div { background-color: #ffffff; }
+.color-folkstone-grey div { background-color: #cbd5e1; }
+.color-storm-grey div { background-color: #64748b; }
+.color-super-black div { background-color: #0f172a; }
